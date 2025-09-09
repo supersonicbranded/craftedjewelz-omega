@@ -10,7 +10,7 @@ mac:
   publish:
     - github
   dmg:
-    license: false   # ✅ disables dmg-license so builds don’t fail
+    license: false   # ✅ disables dmg-license requirement
 
 win:
   target:
