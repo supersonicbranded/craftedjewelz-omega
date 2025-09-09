@@ -2,25 +2,16 @@ appId: com.craftedjewelz.app
 productName: CraftedJewelz
 
 mac:
-  target:
-    - dmg
-  notarize: false
-  identity: null
-  artifactName: "CraftedJewelz-${version}-mac.${ext}"
-  publish:
-    - github
+  target: dmg
   dmg:
-    license: false   # ✅ disables dmg-license requirement
+    sign: false
+    license: false   # ✅ disables dmg-license
 
 win:
-  target:
-    - nsis
-  artifactName: "CraftedJewelz-${version}-win.${ext}"
+  target: nsis
 
 linux:
-  target:
-    - AppImage
-  artifactName: "CraftedJewelz-${version}-linux.${ext}"
+  target: AppImage
 
 publish:
   provider: github
