@@ -1,0 +1,1 @@
+Card-present guidance with Square Terminal or mobile companion app.

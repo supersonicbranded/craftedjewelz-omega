@@ -1,0 +1,1 @@
+Payments: Square, PayPal, Stripe (Apple Pay & Cash App Pay).

@@ -1,0 +1,1 @@
+Use GitHub Releases or S3/CloudFront for updates.

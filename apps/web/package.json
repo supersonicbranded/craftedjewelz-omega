@@ -1,0 +1,26 @@
+{
+  "name": "craftedjewelz",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "electron": "electron apps/web/electron/main.js",
+    "build:mac": "echo",
+    "build:win": "echo",
+    "build:linux": "echo"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "typescript": "^5.5.0",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}

@@ -1,0 +1,1 @@
+from fastapi import FastAPI, Request\napp=FastAPI()\n@app.get('/')\ndef root(): return {'ok':True}\n
