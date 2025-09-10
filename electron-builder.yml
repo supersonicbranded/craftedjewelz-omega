@@ -2,28 +2,34 @@ appId: com.craftedjewelz.app
 productName: CraftedJewelz
 
 mac:
-  target: dmg                  # force DMG output
+  target: dmg
   artifactName: "CraftedJewelz-${version}-mac.${ext}"
-  sign: false                  # disable signing
-  notarize: false              # disable notarization
+  icon: build/icons/craftedjewelsicon.icns
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
 
 dmg:
-  sign: false                  # no codesign
-  format: ULFO                 # universal dmg format (works unsigned)
+  sign: true
+  notarize: true
 
 win:
   target: nsis
   artifactName: "CraftedJewelz-${version}-win.${ext}"
+  icon: build/icons/craftedjewelsicon.ico
 
 linux:
   target: AppImage
   artifactName: "CraftedJewelz-${version}-linux.${ext}"
+  icon: build/icons/
 
 files:
-  - "dist/**/*"        # frontend build
-  - "electron/**/*"    # electron main process
+  - "dist/**/*"
+  - "electron/**/*"
 
 publish:
   provider: github
   releaseType: release
+
 
