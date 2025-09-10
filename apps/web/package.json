@@ -4,7 +4,12 @@
   "version": "1.0.0",
   "description": "CraftedJewelz Flagship Jewelry CAD Software",
   "author": "Supersonic Branded",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
+  },
   "type": "module",
+
 
   "scripts": {
     "dev": "vite",
