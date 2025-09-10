@@ -31,14 +31,13 @@ jobs:
       - name: Sync version with tag
         working-directory: apps/web
         run: |
-          TAG=${GITHUB_REF#refs/tags/}
-          VERSION=${TAG#v}
-          echo "Setting package.json version to $VERSION"
-          npm version --no-git-tag-version $VERSION
+          echo "Setting package.json version to ${{ github.ref_name }}"
+          npm version --no-git-tag-version ${{ github.ref_name }} 
 
       - name: Build & Publish
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx electron-builder --config ../../electron-builder.yml --publish always
+
 
