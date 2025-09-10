@@ -24,4 +24,4 @@ jobs:
 
       - name: Build & Publish
         working-directory: apps/web
-        run: npx electron-builder -c ../../electron-builder.yml --publish always
+        run: npx electron-builder --config ../../electron-builder.yml --publish always
