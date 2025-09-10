@@ -2,7 +2,10 @@
   "name": "craftedjewelz",
   "private": true,
   "version": "1.0.0",
+  "description": "CraftedJewelz Flagship Jewelry CAD Software",
+  "author": "Supersonic Branded",
   "type": "module",
+
   "scripts": {
     "dev": "vite",
     "build": "vite build",
