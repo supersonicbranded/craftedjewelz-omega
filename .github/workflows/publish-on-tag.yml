@@ -22,6 +22,14 @@ jobs:
         working-directory: apps/web
         run: npm install
 
+      - name: Sync version with tag
+        working-directory: apps/web
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "Setting package.json version to $VERSION"
+          npm version --no-git-tag-version $VERSION
+
       - name: Build & Publish
         working-directory: apps/web
         env:
