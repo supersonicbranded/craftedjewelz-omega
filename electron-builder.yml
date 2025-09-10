@@ -8,8 +8,7 @@ mac:
     - github
 
 dmg:
-  sign: false
-  license: false   # ✅ now top-level, not inside mac
+  sign: false   # disable code signing, keep it simple
 
 win:
   target: nsis
