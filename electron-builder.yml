@@ -8,7 +8,7 @@ mac:
     - github
 
 dmg:
-  sign: false   # disable code signing, keep it simple
+  sign: false   # no license section
 
 win:
   target: nsis
@@ -17,6 +17,10 @@ win:
 linux:
   target: AppImage
   artifactName: "CraftedJewelz-${version}-linux.${ext}"
+
+files:
+  - "dist/**/*"        # include Vite frontend build
+  - "electron/**/*"    # include Electron main process
 
 publish:
   provider: github
