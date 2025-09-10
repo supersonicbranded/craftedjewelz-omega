@@ -8,7 +8,7 @@ mac:
     - github
 
 dmg:
-  sign: false   # no license section
+  sign: false   # disable codesigning for now
 
 win:
   target: nsis
@@ -19,8 +19,10 @@ linux:
   artifactName: "CraftedJewelz-${version}-linux.${ext}"
 
 files:
-  - "dist/**/*"        # include Vite frontend build
+  - "dist/**/*"        # include frontend build
   - "electron/**/*"    # include Electron main process
 
 publish:
   provider: github
+  releaseType: release   # force normal releases, not drafts
+
