@@ -8,16 +8,12 @@
     "type": "git",
     "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   },
+  "main": "electron/main.js",        // 👈 Electron entry point
   "type": "module",
-
-
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "electron": "electron apps/web/electron/main.js",
-    "build:mac": "echo",
-    "build:win": "echo",
-    "build:linux": "echo"
+    "electron": "electron electron/main.js"
   },
   "dependencies": {
     "react": "^18.2.0",
