@@ -2,13 +2,14 @@ appId: com.craftedjewelz.app
 productName: CraftedJewelz
 
 mac:
-  target: dmg
+  target: dmg                  # force DMG output
   artifactName: "CraftedJewelz-${version}-mac.${ext}"
-  publish:
-    - github
+  sign: false                  # disable signing
+  notarize: false              # disable notarization
 
 dmg:
-  sign: false   # disable codesigning for now
+  sign: false                  # no codesign
+  format: ULFO                 # universal dmg format (works unsigned)
 
 win:
   target: nsis
@@ -19,10 +20,10 @@ linux:
   artifactName: "CraftedJewelz-${version}-linux.${ext}"
 
 files:
-  - "dist/**/*"        # include frontend build
-  - "electron/**/*"    # include Electron main process
+  - "dist/**/*"        # frontend build
+  - "electron/**/*"    # electron main process
 
 publish:
   provider: github
-  releaseType: release   # force normal releases, not drafts
+  releaseType: release
 
