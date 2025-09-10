@@ -3,15 +3,21 @@ productName: CraftedJewelz
 
 mac:
   target: dmg
-  dmg:
-    sign: false
-    license: false   # ✅ disables dmg-license
+  artifactName: "CraftedJewelz-${version}-mac.${ext}"
+  publish:
+    - github
+
+dmg:
+  sign: false
+  license: false   # ✅ now top-level, not inside mac
 
 win:
   target: nsis
+  artifactName: "CraftedJewelz-${version}-win.${ext}"
 
 linux:
   target: AppImage
+  artifactName: "CraftedJewelz-${version}-linux.${ext}"
 
 publish:
   provider: github
