@@ -1,20 +1,25 @@
-name: Build Installers
+name: Build & Publish Installers
 
 on:
   push:
     tags:
-      - "v*.*.*"
+      - 'v*'
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Verify GH_TOKEN exists
+        run: |
+          if [ -z "${{ secrets.GH_TOKEN }}" ]; then
+            echo "❌ ERROR: GH_TOKEN secret is missing. Please add it in GitHub → Settings → Secrets → Actions."
+            exit 1
+          fi
+        shell: bash
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -25,12 +30,14 @@ jobs:
         run: npm install
         working-directory: apps/web
 
-      - name: Build Vite
+      - name: Build frontend
         run: npm run build
         working-directory: apps/web
 
-      - name: Build Installers
-        run: npx electron-builder --publish always --x64
+      - name: Package Electron App
+        run: |
+          echo "Using GH_TOKEN: ${{ secrets.GH_TOKEN:0:4 }}****"
+          npx electron-builder --publish always --x64
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
