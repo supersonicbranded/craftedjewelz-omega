@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "main": "electron/main.js",
-  "type": "commonjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "start": "electron electron/main.js"
+    "electron": "electron electron/main.js"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -45,12 +44,8 @@
         "provider": "github"
       }
     ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
-  },
-  "author": "SupersonicBranded",
-  "description": "CraftedJewelz flagship jewelry design software"
+  }
+}
+ flagship jewelry design software"
 }
 
