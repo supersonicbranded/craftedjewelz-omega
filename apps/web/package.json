@@ -1,8 +1,8 @@
 {
   "name": "craftedjewelz",
-  "version": "1.0.0",
-  "description": "CraftedJewelz Jewelry CAD software",
-  "author": "CraftedJewelz Team",
+  "version": "1.0.31",
+  "description": "CraftedJewelz CAD software for jewelry design",
+  "author": "Supersonic Branded",
   "private": true,
   "main": "electron/main.js",
   "scripts": {
@@ -22,16 +22,20 @@
     "electron": "^30.0.0",
     "electron-builder": "^24.13.3"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
+  },
   "build": {
     "appId": "com.craftedjewelz.app",
     "productName": "CraftedJewelz",
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
     "directories": {
       "buildResources": "build"
     },
-    "files": [
-      "dist/**",
-      "electron/**"
-    ],
     "mac": {
       "target": "dmg",
       "artifactName": "CraftedJewelz-${version}-mac.${ext}"
@@ -42,19 +46,14 @@
     },
     "linux": {
       "target": "AppImage",
-      "artifactName": "CraftedJewelz-${version}-linux.${ext}"
+      "artifactName": "CraftedJewelz-${version}-linux.${ext}",
+      "category": "Utility"
     },
     "publish": [
       {
         "provider": "github"
       }
     ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   }
 }
-nicbranded/craftedjewelz-omega.git"
-  }
-}
+
