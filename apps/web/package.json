@@ -1,7 +1,7 @@
- {
+{
   "name": "craftedjewelz",
   "private": true,
-  "version": "1.0.26",
+  "version": "1.0.27",
   "description": "CraftedJewelz professional jewelry CAD app",
   "author": "Supersonic Branded",
   "type": "module",
@@ -50,15 +50,13 @@
       "category": "Graphics"
     },
     "publish": [
-      { "provider": "github" }
+      {
+        "provider": "github"
+      }
     ]
   }
 }
 
-      { "provider": "github" }
-    ]
-  }
-}
 
 
 
