@@ -1,49 +1,40 @@
-const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow } = require("electron");
 const path = require("path");
-const fs = require("fs");
-
-let mainWindow;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 1200,
+  const win = new BrowserWindow({
+    width: 1280,
     height: 800,
     webPreferences: {
       preload: path.join(__dirname, "preload.js")
     },
-    icon: path.join(__dirname, "../build/icons/appicon.png")
+    icon: path.join(__dirname, "../build/icons/app.png") // make sure app.png exists in build/icons
   });
 
-  mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+  // Load your built Vite frontend
+  win.loadFile(path.join(__dirname, "../dist/index.html"));
+
+  // Optional: Open dev tools in development
+  if (!app.isPackaged) {
+    win.webContents.openDevTools();
+  }
 }
 
-app.on("ready", createWindow);
+app.whenReady().then(() => {
+  createWindow();
 
-// IPC Handlers
-ipcMain.handle("get-version", () => app.getVersion());
-ipcMain.handle("save-file", async (_, data) => {
-  const { filePath } = await dialog.showSaveDialog({
-    filters: [{ name: "JSON", extensions: ["json"] }]
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
   });
-  if (filePath) {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-    return "saved";
-  }
-  return "cancelled";
 });
 
-ipcMain.handle("open-file", async () => {
-  const { filePaths } = await dialog.showOpenDialog({
-    filters: [{ name: "JSON", extensions: ["json"] }]
-  });
-  if (filePaths.length > 0) {
-    return fs.readFileSync(filePaths[0], "utf-8");
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
   }
-  return null;
 });
 
-ipcMain.handle("check-for-updates", () => {
-  return "update-check-stub";
-});
 
 
