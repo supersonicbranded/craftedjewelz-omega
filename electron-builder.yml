@@ -4,32 +4,32 @@ productName: CraftedJewelz
 mac:
   target: dmg
   artifactName: "CraftedJewelz-${version}-mac.${ext}"
-  icon: build/icons/craftedjewelsicon.icns
-  hardenedRuntime: true
-  gatekeeperAssess: false
-  entitlements: build/entitlements.mac.plist
-  entitlementsInherit: build/entitlements.mac.plist
+  icon: build/icons/craftedjewelz.icns
+  publish:
+    - github
 
 dmg:
-  sign: true
-  notarize: true
+  background: assets/dmg-background.png
+  contents:
+    - x: 130
+      y: 220
+      type: file
+      path: "CraftedJewelz.app"
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
 
 win:
   target: nsis
   artifactName: "CraftedJewelz-${version}-win.${ext}"
-  icon: build/icons/craftedjewelsicon.ico
+  icon: build/icons/craftedjewelz.ico
 
 linux:
   target: AppImage
   artifactName: "CraftedJewelz-${version}-linux.${ext}"
-  icon: build/icons/
-
-files:
-  - "dist/**/*"
-  - "electron/**/*"
+  icon: build/icons/craftedjewelz.png
 
 publish:
   provider: github
-  releaseType: release
-
 
