@@ -1,13 +1,9 @@
 {
   "name": "craftedjewelz",
   "private": true,
-  "version": "1.0.27",
+  "version": "1.0.31",
   "description": "CraftedJewelz professional jewelry CAD app",
   "author": "Supersonic Branded",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
-  },
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
@@ -55,10 +51,14 @@
     },
     "publish": [
       {
-        "provider": "github"
+        "provider": "github",
+        "owner": "supersonicbranded",
+        "repo": "craftedjewelz-omega"
       }
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   }
 }
-
-
