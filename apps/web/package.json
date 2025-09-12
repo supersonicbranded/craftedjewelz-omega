@@ -1,31 +1,32 @@
-{
-  "name": "craftedjewelz",
-  "private": true,
-  "version": "1.0.0",
-  "description": "CraftedJewelz Flagship Jewelry CAD Software",
-  "author": "Supersonic Branded",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
-  },
-  "main": "electron/main.js",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "electron": "electron electron/main.js"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "vite": "^5.4.0",
-    "typescript": "^5.5.0",
-    "@types/react": "^18.2.66",
-    "@types/react-dom": "^18.2.22",
-    "electron": "^30.0.0",
-    "electron-builder": "^24.13.3"
+  "build": {
+    "appId": "com.craftedjewelz.app",
+    "productName": "CraftedJewelz",
+    "directories": {
+      "buildResources": "../../assets"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icons/craftedjewelz.icns"
+    },
+    "dmg": {
+      "background": "assets/dmg-background.png",
+      "contents": [
+        { "x": 130, "y": 220, "type": "file", "path": "CraftedJewelz.app" },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icons/craftedjewelz.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/icons/craftedjewelz.png",
+      "category": "Graphics"
+    },
+    "publish": [
+      { "provider": "github" }
+    ]
   }
-}
+
 
