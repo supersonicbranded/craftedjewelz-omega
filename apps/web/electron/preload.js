@@ -1,6 +1,6 @@
-const { contextBridge } = require("electron");
+const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld("craftedjewelz", {
-  version: "1.0.0"
+contextBridge.exposeInMainWorld("api", {
+  ping: () => ipcRenderer.invoke("ping")
 });
 
