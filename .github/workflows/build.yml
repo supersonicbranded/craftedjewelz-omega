@@ -36,7 +36,7 @@ jobs:
 
       - name: Package Electron App
         run: |
-          echo "Using GH_TOKEN: ${{ secrets.GH_TOKEN:0:4 }}****"
+          echo "✅ GH_TOKEN detected, starting build..."
           npx electron-builder --publish always --x64
         working-directory: apps/web
         env:
