@@ -1,25 +1,19 @@
-name: Publish on Tag
+name: build
 
 on:
   push:
     tags:
       - "v*"
 
-permissions:
-  contents: write   # allow publishing to Releases
-
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -28,44 +22,23 @@ jobs:
         working-directory: apps/web
         run: npm install
 
-      - name: Sync version with tag
-        working-directory: apps/web
-        run: |
-          echo "Setting package.json version to ${{ github.ref_name }}"
-          npm version --no-git-tag-version ${{ github.ref_name }}
-
       - name: Build frontend
         working-directory: apps/web
         run: npm run build
 
-      - name: Install ImageMagick
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y imagemagick icnsutils
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            brew install imagemagick icnsutils
-          fi
-
-      - name: Generate app icons
+      - name: Prepare Icons
         run: |
           mkdir -p build/icons
-          cp craftedjewelsicon.png build/icons/craftedjewelsicon.png
-          
-          # Generate ICNS for macOS
-          sips -z 512 512 build/icons/craftedjewelsicon.png --out build/icons/craftedjewelsicon-512.png
-          iconutil -c icns --output build/icons/craftedjewelsicon.icns build/icons/
-          
-          # Generate ICO for Windows
-          convert build/icons/craftedjewelsicon.png -define icon:auto-resize=256,128,64,48,32,16 build/icons/craftedjewelsicon.ico
+          # Convert PNG into ICNS (macOS)
+          magick assets/appicon2.png -resize 1024x1024 build/icons/craftedjewelz.icns
+          # Convert PNG into ICO (Windows)
+          magick assets/appicon2.png -resize 256x256 build/icons/craftedjewelz.ico
+          # Copy PNG for Linux
+          cp assets/appicon2.png build/icons/craftedjewelz.png
 
-      - name: Build & Publish
+      - name: Package & Publish
         working-directory: apps/web
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npx electron-builder --config ../../electron-builder.yml --publish always
-
-
 
