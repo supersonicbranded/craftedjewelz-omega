@@ -1,19 +1,19 @@
-name: build
+name: Build & Publish
 
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -22,21 +22,11 @@ jobs:
         working-directory: apps/web
         run: npm install
 
-      - name: Build frontend
+      - name: Build web app
         working-directory: apps/web
         run: npm run build
 
-      - name: Install ImageMagick
-        run: sudo apt-get update && sudo apt-get install -y imagemagick icnsutils
-
-      - name: Prepare Icons
-        run: |
-          mkdir -p build/icons
-          convert assets/appicon2.png -resize 1024x1024 build/icons/craftedjewelz.icns
-          convert assets/appicon2.png -resize 256x256 build/icons/craftedjewelz.ico
-          cp assets/appicon2.png build/icons/craftedjewelz.png
-
-      - name: Package & Publish
+      - name: Build & Publish installers
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
