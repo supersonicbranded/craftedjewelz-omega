@@ -1,18 +1,13 @@
 {
   "name": "craftedjewelz",
   "version": "1.0.0",
-  "description": "CraftedJewelz — next-gen professional jewelry CAD software.",
-  "author": "Supersonic Branded",
   "private": true,
-  "type": "module",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
-  },
+  "main": "electron/main.js",
+  "type": "commonjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "electron": "electron electron/main.js"
+    "start": "electron electron/main.js"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -34,36 +29,28 @@
     },
     "files": [
       "dist/**/*",
-      "electron/**/*",
-      "preload.js"
+      "electron/**/*"
     ],
     "mac": {
-      "target": "dmg",
-      "artifactName": "CraftedJewelz-${version}-mac.${ext}",
-      "icon": "build/icons/appicon2.png"
-    },
-    "dmg": {
-      "background": "build/backgrounds/dmg-background.png",
-      "iconSize": 128,
-      "contents": [
-        { "x": 130, "y": 220, "type": "file" },
-        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
-      ]
+      "target": "dmg"
     },
     "win": {
-      "target": "nsis",
-      "artifactName": "CraftedJewelz-${version}-win.${ext}",
-      "icon": "build/icons/appicon2.png"
+      "target": "nsis"
     },
     "linux": {
-      "target": "AppImage",
-      "artifactName": "CraftedJewelz-${version}-linux.${ext}",
-      "icon": "build/icons/appicon2.png"
+      "target": "AppImage"
     },
     "publish": [
       {
         "provider": "github"
       }
     ]
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
+  },
+  "author": "SupersonicBranded",
+  "description": "CraftedJewelz flagship jewelry design software"
 }
+
