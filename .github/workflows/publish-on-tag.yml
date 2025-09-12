@@ -26,7 +26,7 @@ jobs:
         working-directory: apps/web
         run: npm run build
 
-      # ✅ Install ImageMagick so "magick" works
+      # ✅ Install ImageMagick & icnsutils
       - name: Install ImageMagick
         run: sudo apt-get update && sudo apt-get install -y imagemagick icnsutils
 
@@ -34,9 +34,9 @@ jobs:
         run: |
           mkdir -p build/icons
           # Convert PNG into ICNS (macOS)
-          magick assets/appicon2.png -resize 1024x1024 build/icons/craftedjewelz.icns
+          convert assets/appicon2.png -resize 1024x1024 build/icons/craftedjewelz.icns
           # Convert PNG into ICO (Windows)
-          magick assets/appicon2.png -resize 256x256 build/icons/craftedjewelz.ico
+          convert assets/appicon2.png -resize 256x256 build/icons/craftedjewelz.ico
           # Copy PNG for Linux
           cp assets/appicon2.png build/icons/craftedjewelz.png
 
