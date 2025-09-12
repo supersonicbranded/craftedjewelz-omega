@@ -39,15 +39,26 @@
     ],
     "mac": {
       "target": "dmg",
-      "artifactName": "CraftedJewelz-${version}-mac.${ext}"
+      "artifactName": "CraftedJewelz-${version}-mac.${ext}",
+      "icon": "build/icons/appicon2.png"
+    },
+    "dmg": {
+      "background": "build/backgrounds/dmg-background.png",
+      "iconSize": 128,
+      "contents": [
+        { "x": 130, "y": 220, "type": "file" },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
     },
     "win": {
       "target": "nsis",
-      "artifactName": "CraftedJewelz-${version}-win.${ext}"
+      "artifactName": "CraftedJewelz-${version}-win.${ext}",
+      "icon": "build/icons/appicon2.png"
     },
     "linux": {
       "target": "AppImage",
-      "artifactName": "CraftedJewelz-${version}-linux.${ext}"
+      "artifactName": "CraftedJewelz-${version}-linux.${ext}",
+      "icon": "build/icons/appicon2.png"
     },
     "publish": [
       {
@@ -56,5 +67,3 @@
     ]
   }
 }
-
-
