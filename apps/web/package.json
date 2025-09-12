@@ -1,3 +1,28 @@
+  {
+  "name": "craftedjewelz",
+  "private": true,
+  "version": "1.0.26",
+  "description": "CraftedJewelz professional jewelry CAD app",
+  "author": "Supersonic Branded",
+  "type": "module",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "electron": "electron apps/web/electron/main.js"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "typescript": "^5.5.0",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
   "build": {
     "appId": "com.craftedjewelz.app",
     "productName": "CraftedJewelz",
@@ -28,5 +53,7 @@
       { "provider": "github" }
     ]
   }
+}
+
 
 
