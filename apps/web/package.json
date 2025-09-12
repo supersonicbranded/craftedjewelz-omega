@@ -31,13 +31,16 @@
       "electron/**/*"
     ],
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "artifactName": "CraftedJewelz-${version}-mac.${ext}"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "artifactName": "CraftedJewelz-${version}-win.${ext}"
     },
     "linux": {
-      "target": "AppImage"
+      "target": "AppImage",
+      "artifactName": "CraftedJewelz-${version}-linux.${ext}"
     },
     "publish": [
       {
@@ -51,15 +54,5 @@
   },
   "author": "supersonicbranded",
   "license": "MIT"
-}
- "github" }]
-  }
-}
-
-      }
-    ]
-  }
-}
- flagship jewelry design software"
 }
 
