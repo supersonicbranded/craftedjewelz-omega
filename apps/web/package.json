@@ -1,6 +1,6 @@
 {
   "name": "craftedjewelz",
-  "version": "1.0.31",
+  "version": "1.0.32",
   "description": "CraftedJewelz CAD software for jewelry design",
   "author": "Supersonic Branded",
   "private": true,
@@ -56,4 +56,3 @@
     ]
   }
 }
-
