@@ -1,4 +1,4 @@
-  {
+ {
   "name": "craftedjewelz",
   "private": true,
   "version": "1.0.26",
@@ -50,6 +50,11 @@
       "category": "Graphics"
     },
     "publish": [
+      { "provider": "github" }
+    ]
+  }
+}
+
       { "provider": "github" }
     ]
   }
