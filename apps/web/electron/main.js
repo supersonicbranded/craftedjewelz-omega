@@ -3,21 +3,15 @@ const path = require("path");
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1280,
+    width: 1200,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js")
+      preload: path.join(__dirname, "preload.js"),
     },
-    icon: path.join(__dirname, "../build/icons/app.png") // make sure app.png exists in build/icons
   });
 
-  // Load your built Vite frontend
+  // Load the Vite build output
   win.loadFile(path.join(__dirname, "../dist/index.html"));
-
-  // Optional: Open dev tools in development
-  if (!app.isPackaged) {
-    win.webContents.openDevTools();
-  }
 }
 
 app.whenReady().then(() => {
@@ -35,6 +29,7 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
+
 
 
 
