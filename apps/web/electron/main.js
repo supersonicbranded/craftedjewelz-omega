@@ -86,7 +86,7 @@ autoUpdater.on("update-downloaded", (info) => {
   }
 });
 
-// 🛠️ App version
+// App version
 ipcMain.handle("app:getVersion", () => app.getVersion());
 
 // App lifecycle
