@@ -1,25 +1,20 @@
-name: Build & Publish Installers
+name: Build & Publish CraftedJewelz
 
 on:
   push:
     tags:
-      - 'v*'
+      - "v*.*.*"
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Verify GH_TOKEN exists
-        run: |
-          if [ -z "${{ secrets.GH_TOKEN }}" ]; then
-            echo "❌ ERROR: GH_TOKEN secret is missing. Please add it in GitHub → Settings → Secrets → Actions."
-            exit 1
-          fi
-        shell: bash
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,17 +22,16 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
+        working-directory: apps/web
         run: npm install
-        working-directory: apps/web
 
-      - name: Build frontend
+      - name: Build Vite frontend
+        working-directory: apps/web
         run: npm run build
-        working-directory: apps/web
 
-      - name: Package Electron App
-        run: |
-          echo "✅ GH_TOKEN detected, starting build..."
-          npx electron-builder --publish always --x64
+      - name: Build & Publish Installers
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx electron-builder --publish always --x64
+
