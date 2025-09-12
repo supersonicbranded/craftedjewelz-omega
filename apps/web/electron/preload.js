@@ -6,7 +6,7 @@ contextBridge.exposeInMainWorld("craftedjewelz", {
   // Basic ping test
   ping: () => "pong",
 
-  // ⚡ File I/O helpers
+  // File I/O helpers
   saveFile: async (data, defaultPath) => {
     return await ipcRenderer.invoke("file:save", { data, defaultPath });
   },
@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld("craftedjewelz", {
     return await ipcRenderer.invoke("file:open");
   },
 
-  // 💎 Jewelry CAD-specific configs
+  // Jewelry CAD-specific configs
   getDiamondSettings: async () => {
     return await ipcRenderer.invoke("cad:getDiamondSettings");
   },
@@ -22,14 +22,14 @@ contextBridge.exposeInMainWorld("craftedjewelz", {
     return await ipcRenderer.invoke("cad:setDiamondSettings", settings);
   },
 
-  // 🔄 Auto-updater hooks
+  // Auto-updater hooks
   checkForUpdates: () => ipcRenderer.send("update:check"),
   onUpdateAvailable: (callback) =>
     ipcRenderer.on("update:available", (_event, info) => callback(info)),
   onUpdateDownloaded: (callback) =>
     ipcRenderer.on("update:downloaded", (_event, info) => callback(info)),
 
-  // 🛠️ App info
+  // App info
   getAppVersion: () => ipcRenderer.invoke("app:getVersion"),
 });
 
