@@ -22,13 +22,12 @@ jobs:
         working-directory: apps/web
         run: npm install
 
-      - name: Build front-end
+      - name: Build frontend
         working-directory: apps/web
         run: npm run build
 
-      - name: Build installers
+      - name: Package and Publish installers
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --publish always
-
+        run: npx electron-builder --publish always --x64 --arm64
