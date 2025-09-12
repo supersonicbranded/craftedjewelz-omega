@@ -1,44 +1,47 @@
 {
   "name": "craftedjewelz",
-  "version": "1.0.32",
-  "description": "CraftedJewelz CAD software for jewelry design",
-  "author": "Supersonic Branded",
+  "version": "1.0.0",
+  "description": "CraftedJewelz - Professional Jewelry CAD Software",
+  "author": "SupersonicBranded",
   "private": true,
   "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "electron": "electron electron/main.js"
+    "start": "electron electron/main.js",
+    "dist": "electron-builder"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "vite": "^5.4.0",
-    "typescript": "^5.5.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "electron": "^30.0.0",
-    "electron-builder": "^24.13.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.5.0",
+    "vite": "^5.4.0"
   },
   "build": {
     "appId": "com.craftedjewelz.app",
     "productName": "CraftedJewelz",
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "build/icons/**/*"
     ],
     "directories": {
       "buildResources": "build"
     },
     "mac": {
       "target": "dmg",
-      "artifactName": "CraftedJewelz-${version}-mac.${ext}"
+      "artifactName": "CraftedJewelz-${version}-mac.${ext}",
+      "category": "public.app-category.graphics-design"
+    },
+    "dmg": {
+      "sign": false,
+      "background": "assets/dmg-background.png"
     },
     "win": {
       "target": "nsis",
@@ -47,12 +50,19 @@
     "linux": {
       "target": "AppImage",
       "artifactName": "CraftedJewelz-${version}-linux.${ext}",
-      "category": "Utility"
+      "category": "Graphics"
     },
     "publish": [
       {
-        "provider": "github"
+        "provider": "github",
+        "owner": "supersonicbranded",
+        "repo": "craftedjewelz-omega"
       }
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   }
 }
+
