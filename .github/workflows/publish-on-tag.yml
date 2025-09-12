@@ -1,4 +1,4 @@
-name: Build & Release CraftedJewelz
+name: Build & Publish Installers
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -26,8 +26,8 @@ jobs:
         working-directory: apps/web
         run: npm run build
 
-      - name: Package and Publish installers
+      - name: Build & Publish Installers
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --publish always --x64 --arm64
+        run: npx electron-builder --publish always --x64
