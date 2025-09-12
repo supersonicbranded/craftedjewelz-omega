@@ -30,18 +30,13 @@
       "dist/**/*",
       "electron/**/*"
     ],
-    "mac": {
-      "target": "dmg"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "linux": {
-      "target": "AppImage"
-    },
-    "publish": [
-      {
-        "provider": "github"
+    "mac": { "target": "dmg" },
+    "win": { "target": "nsis" },
+    "linux": { "target": "AppImage" },
+    "publish": [{ "provider": "github" }]
+  }
+}
+
       }
     ]
   }
