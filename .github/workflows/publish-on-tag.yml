@@ -26,16 +26,16 @@ jobs:
         working-directory: apps/web
         run: npm run build
 
-      # ✅ Install ImageMagick & icnsutils
+      # ✅ Install ImageMagick so we can generate .icns and .ico
       - name: Install ImageMagick
         run: sudo apt-get update && sudo apt-get install -y imagemagick icnsutils
 
       - name: Prepare Icons
         run: |
           mkdir -p build/icons
-          # Convert PNG into ICNS (macOS)
+          # Convert PNG → ICNS (macOS)
           convert assets/appicon2.png -resize 1024x1024 build/icons/craftedjewelz.icns
-          # Convert PNG into ICO (Windows)
+          # Convert PNG → ICO (Windows)
           convert assets/appicon2.png -resize 256x256 build/icons/craftedjewelz.ico
           # Copy PNG for Linux
           cp assets/appicon2.png build/icons/craftedjewelz.png
@@ -44,4 +44,5 @@ jobs:
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --config ../../electron-builder.yml --publish always
+        run: npx electron-builder --config ../../electron-builder.yml --publish always --x64
+
