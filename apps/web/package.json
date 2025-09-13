@@ -1,48 +1,60 @@
 {
   "name": "craftedjewelz",
-  "version": "1.0.0",
-  "description": "CraftedJewelz desktop app",
-  "author": "Supersonic Branded <you@example.com>",
+  "version": "2.0.5",
+  "description": "CraftedJewelz Omega desktop app",
+  "author": "Supersonic Branded",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron .",
     "build": "electron-builder"
   },
-  "dependencies": {
-    "electron-updater": "^6.1.8"
-  },
-  "devDependencies": {
-    "electron": "^30.5.1",
-    "electron-builder": "^24.13.3"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   },
   "build": {
-    "appId": "com.craftedjewelz.app",
+    "appId": "com.supersonicbranded.craftedjewelz",
     "productName": "CraftedJewelz",
     "files": [
-      "dist/**/*",
       "main.js",
       "preload.js",
-      "package.json"
+      "index.html",
+      "renderer/**/*",
+      "assets/**/*",
+      "build/**/*",
+      "!node_modules/**/.cache",
+      "!dist"
     ],
     "directories": {
       "buildResources": "build"
     },
     "mac": {
-      "category": "public.app-category.graphics-design",
-      "target": ["dmg", "zip"]
+      "target": "dmg",
+      "icon": "build/icons/appicon.icns",
+      "category": "public.app-category.utilities"
     },
     "win": {
-      "target": ["nsis", "zip"]
+      "target": "nsis",
+      "icon": "build/icons/appicon.ico",
+      "artifactName": "CraftedJewelz-${version}-win.${ext}"
     },
     "linux": {
-      "target": ["AppImage", "deb"],
-      "category": "Utility"
+      "target": "AppImage",
+      "category": "Utility",
+      "icon": "build/icons",
+      "artifactName": "CraftedJewelz-${version}-linux.${ext}"
     },
     "publish": [
       {
-        "provider": "github"
+        "provider": "github",
+        "owner": "supersonicbranded",
+        "repo": "craftedjewelz-omega"
       }
     ]
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
   }
 }
+
