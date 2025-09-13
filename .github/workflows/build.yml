@@ -7,34 +7,50 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      # Install dependencies for Linux
+      - name: Set up dependencies (Linux only)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick icnsutils graphicsmagick
+
+      # Install dependencies for macOS
+      - name: Set up dependencies (macOS only)
+        if: runner.os == 'macOS'
+        run: |
+          brew install imagemagick icnsutils graphicsmagick
+
       - name: Install dependencies
         run: npm install
-        working-directory: apps/web
 
-      - name: Build Installers
-        run: npm run build
-        working-directory: apps/web
+      - name: Generate icons
+        run: |
+          mkdir -p apps/web/build/icons
+          cp apps/web/build/appicon2.png apps/web/build/icons/appicon.png
+          convert apps/web/build/appicon2.png -resize 256x256 apps/web/build/icons/256x256.png
+          convert apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/512x512.png
+
+      - name: Build with Electron Builder
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx electron-builder --publish always
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: craftedjewelz-installers
-          path: apps/web/dist/**
-
-
+          name: craftedjewelz-installers-${{ matrix.os }}
+          path: dist/*
