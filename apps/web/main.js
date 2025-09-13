@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
+const isDev = require("electron-is-dev");
 
 let mainWindow;
 
@@ -15,26 +16,27 @@ function createWindow() {
     icon: path.join(__dirname, "build", "appicon2.png")
   });
 
-  // Load your frontend (can be index.html or a React build later)
-  mainWindow.loadFile(path.join(__dirname, "index.html"));
+  if (isDev) {
+    mainWindow.loadURL("http://localhost:3000");
+  } else {
+    mainWindow.loadFile(path.join(__dirname, "renderer", "dist", "index.html"));
+  }
 
-  mainWindow.on("closed", function () {
+  mainWindow.on("closed", () => {
     mainWindow = null;
   });
 }
 
 app.on("ready", createWindow);
 
-app.on("window-all-closed", function () {
+app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
 
-app.on("activate", function () {
+app.on("activate", () => {
   if (mainWindow === null) createWindow();
 });
 
-// Example IPC channel
-ipcMain.handle("ping", async () => {
-  return "pong";
-});
+ipcMain.handle("ping", async () => "pong");
+
 
