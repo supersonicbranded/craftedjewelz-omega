@@ -1,27 +1,23 @@
 {
   "name": "craftedjewelz",
   "version": "1.0.0",
-  "description": "CraftedJewelz — Professional Jewelry CAD/CAM Platform",
-  "author": "Supersonic Branded <support@craftedjewelz.com>",
-  "license": "MIT",
+  "description": "CraftedJewelz desktop app",
+  "author": "Supersonic Branded <you@example.com>",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electronmon .",
+    "dev": "electron .",
     "build": "electron-builder"
   },
   "dependencies": {
-    "electron": "^30.5.1"
+    "electron-updater": "^6.1.8"
   },
   "devDependencies": {
+    "electron": "^30.5.1",
     "electron-builder": "^24.13.3"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
-  },
   "build": {
-    "appId": "com.supersonicbranded.craftedjewelz",
+    "appId": "com.craftedjewelz.app",
     "productName": "CraftedJewelz",
     "files": [
       "dist/**/*",
@@ -34,26 +30,19 @@
     },
     "mac": {
       "category": "public.app-category.graphics-design",
-      "target": ["dmg", "zip"],
-      "icon": "build/appicon2.png"
+      "target": ["dmg", "zip"]
     },
     "win": {
-      "target": ["nsis", "zip"],
-      "icon": "build/appicon2.png"
+      "target": ["nsis", "zip"]
     },
     "linux": {
-      "target": ["AppImage"],
-      "category": "Utility",
-      "icon": "build/appicon2.png"
+      "target": ["AppImage", "deb"],
+      "category": "Utility"
     },
     "publish": [
       {
-        "provider": "github",
-        "owner": "supersonicbranded",
-        "repo": "craftedjewelz-omega"
+        "provider": "github"
       }
     ]
   }
 }
-
-
