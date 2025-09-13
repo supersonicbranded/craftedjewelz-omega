@@ -1,19 +1,19 @@
-name: Build & Publish Installers
+name: Build & Publish CraftedJewelz
 
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -21,50 +21,39 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: apps/web
-
-      - name: Install ImageMagick (for icon resizing)
-        if: matrix.os == 'ubuntu-latest'
+      # ---------------- ICON TOOLS ----------------
+      - name: Install image tools (Linux)
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y imagemagick icnsutils
+          sudo apt-get install -y imagemagick icnsutils graphicsmagick
 
-      - name: Generate icons
+      - name: Install image tools (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install imagemagick graphicsmagick icoutils
+
+      # ---------------- DEPENDENCIES ----------------
+      - name: Install dependencies
+        run: npm install
+
+      # ---------------- ICONS ----------------
+      - name: Prepare icons
         run: |
           mkdir -p apps/web/build/icons
-          convert apps/web/build/appicon2.png -resize 256x256 apps/web/build/icons/appicon.png
-          convert apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/512x512.png
-          convert apps/web/build/appicon2.png -resize 1024x1024 apps/web/build/icons/1024x1024.png
-          # macOS .icns
-          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
-            mkdir -p apps/web/build/icons/mac.iconset
-            sips -z 16 16     apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_16x16.png
-            sips -z 32 32     apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_16x16@2x.png
-            sips -z 32 32     apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_32x32.png
-            sips -z 64 64     apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_32x32@2x.png
-            sips -z 128 128   apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_128x128.png
-            sips -z 256 256   apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_128x128@2x.png
-            sips -z 256 256   apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_256x256.png
-            sips -z 512 512   apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_256x256@2x.png
-            sips -z 512 512   apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_512x512.png
-            cp apps/web/build/appicon2.png apps/web/build/icons/mac.iconset/icon_512x512@2x.png
-            iconutil -c icns apps/web/build/icons/mac.iconset -o apps/web/build/icons/appicon.icns
-          fi
-          # Windows .ico
-          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
-            convert apps/web/build/appicon2.png -resize 256x256 apps/web/build/icons/appicon.ico
-          fi
+          cp apps/web/build/appicon2.png apps/web/build/icons/appicon.png
+          convert apps/web/build/appicon2.png -resize 256x256 apps/web/build/icons/appicon-256.png || true
+          convert apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/appicon-512.png || true
 
-      - name: Build and publish installers
-        run: npx electron-builder --publish always
-        working-directory: apps/web
+      # ---------------- BUILD ----------------
+      - name: Build Electron app
+        run: npm run build
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Upload artifacts
+      # ---------------- ARTIFACTS ----------------
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: CraftedJewelz-${{ matrix.os }}
-          path: apps/web/dist/*
+          path: dist/**
