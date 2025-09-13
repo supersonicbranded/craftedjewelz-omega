@@ -1,9 +1,9 @@
-name: Build and Release
+name: Build & Release
 
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build:
@@ -11,9 +11,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-
-    permissions:
-      contents: write   # Needed to create releases and upload installers
 
     steps:
       - name: Checkout repository
@@ -25,13 +22,21 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
         working-directory: apps/web
+        run: npm install
 
-      - name: Build and Publish
-        run: npx electron-builder --publish always --x64
+      - name: Build Electron App
         working-directory: apps/web
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          npx electron-builder --publish always
+
+      - name: Upload Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: craftedjewelz-${{ matrix.os }}
+          path: apps/web/dist/*
+
 
 
