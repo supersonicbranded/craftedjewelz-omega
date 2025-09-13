@@ -2,38 +2,52 @@
   "name": "craftedjewelz",
   "version": "2.0.6",
   "description": "CraftedJewelz Desktop App",
-  "author": "supersonicbranded",
+  "author": "Supersonic Branded <youremail@example.com>",
   "main": "main.js",
-  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
+  },
   "scripts": {
-    "dev": "concurrently \"npm:start-renderer\" \"npm:start-electron\"",
-    "start-renderer": "cd renderer && npm start",
-    "start-electron": "electron .",
-    "build": "npm run build-renderer && electron-builder",
-    "build-renderer": "cd renderer && npm run build"
+    "start": "electron .",
+    "build": "electron-builder",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.craftedjewelz.desktop",
+    "appId": "com.supersonicbranded.craftedjewelz",
     "productName": "CraftedJewelz",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
     "files": [
-      "dist/",
       "main.js",
       "preload.js",
-      "index.html",
-      "build/"
+      "renderer/dist/**/*",
+      "package.json"
     ],
-    "directories": {
-      "buildResources": "build"
-    },
     "mac": {
-      "target": "dmg"
+      "category": "public.app-category.utilities",
+      "target": ["dmg", "zip"],
+      "icon": "build/appicon2.icns"
     },
     "win": {
-      "target": "nsis"
+      "target": ["nsis", "zip"],
+      "icon": "build/appicon2.ico"
     },
     "linux": {
       "target": ["AppImage", "deb"],
-      "category": "Utility"
+      "category": "Utility",
+      "icon": "build/appicon2.png"
     },
     "publish": [
       {
@@ -42,21 +56,5 @@
         "repo": "craftedjewelz-omega"
       }
     ]
-  },
-  "dependencies": {
-    "electron-is-dev": "^3.0.1"
-  },
-  "devDependencies": {
-    "electron": "^30.5.1",
-    "electron-builder": "^24.13.3",
-    "concurrently": "^8.2.2"
   }
 }
-
-    "electron-builder": "^24.13.3"
-  },
-  "dependencies": {}
-}
-
-
-
