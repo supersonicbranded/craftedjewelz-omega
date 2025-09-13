@@ -1,19 +1,19 @@
-name: Build & Publish CraftedJewelz
+name: Build & Publish Installers
 
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -21,39 +21,40 @@ jobs:
         with:
           node-version: 20
 
-      # ---------------- ICON TOOLS ----------------
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Install image tools (Linux)
       - name: Install image tools (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick icnsutils graphicsmagick
 
+      # Install image tools (macOS)
       - name: Install image tools (macOS)
         if: runner.os == 'macOS'
         run: |
           brew install imagemagick graphicsmagick icoutils
 
-      # ---------------- DEPENDENCIES ----------------
-      - name: Install dependencies
-        run: npm install
-
-      # ---------------- ICONS ----------------
+      # Prepare icons
       - name: Prepare icons
         run: |
           mkdir -p apps/web/build/icons
-          cp apps/web/build/appicon2.png apps/web/build/icons/appicon.png
-          convert apps/web/build/appicon2.png -resize 256x256 apps/web/build/icons/appicon-256.png || true
-          convert apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/appicon-512.png || true
+          convert assets/appicon2_512.png -resize 256x256 apps/web/build/icons/appicon2.png
+          convert assets/appicon2_512.png -resize 512x512 apps/web/build/icons/appicon512.png
 
-      # ---------------- BUILD ----------------
-      - name: Build Electron app
+      # Build the app
+      - name: Build Electron App
         run: npm run build
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      # ---------------- ARTIFACTS ----------------
+      # Upload artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: CraftedJewelz-${{ matrix.os }}
-          path: dist/**
+          path: dist/*
+
