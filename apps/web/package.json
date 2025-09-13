@@ -1,48 +1,58 @@
 {
   "name": "craftedjewelz",
   "version": "1.0.0",
-  "description": "CraftedJewelz Desktop App",
-  "main": "electron/main.js",
+  "description": "CraftedJewelz — Professional Jewelry CAD/CAM Platform",
+  "author": "Supersonic Branded <support@craftedjewelz.com>",
+  "license": "MIT",
+  "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dev": "electronmon .",
     "build": "electron-builder"
   },
-  "devDependencies": {
-    "electron": "^30.5.1",
-    "electron-builder": "^24.13.3"
+  "dependencies": {
+    "electron": "^30.5.1"
   },
-  "dependencies": {},
-  "build": {
-    "appId": "co.craftedjewelz.app",
-    "productName": "CraftedJewelz",
-    "directories": {
-      "buildResources": "apps/web/build/icons"
-    },
-    "files": [
-      "dist/**/*",
-      "electron/**/*"
-    ],
-    "mac": {
-      "icon": "apps/web/build/icons/appicon.icns",
-      "target": "dmg"
-    },
-    "win": {
-      "icon": "apps/web/build/icons/appicon.ico",
-      "target": "nsis"
-    },
-    "linux": {
-      "icon": "apps/web/build/icons",
-      "target": "AppImage"
-    },
-    "publish": [
-      {
-        "provider": "github"
-      }
-    ]
+  "devDependencies": {
+    "electron-builder": "^24.13.3"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
+  },
+  "build": {
+    "appId": "com.supersonicbranded.craftedjewelz",
+    "productName": "CraftedJewelz",
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "target": ["dmg", "zip"],
+      "icon": "build/appicon2.png"
+    },
+    "win": {
+      "target": ["nsis", "zip"],
+      "icon": "build/appicon2.png"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Utility",
+      "icon": "build/appicon2.png"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "supersonicbranded",
+        "repo": "craftedjewelz-omega"
+      }
+    ]
   }
 }
 
