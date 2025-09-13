@@ -23,6 +23,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
+        working-directory: apps/web
         run: npm install
 
       # Install image tools (Linux)
@@ -47,6 +48,7 @@ jobs:
 
       # Build the app
       - name: Build Electron App
+        working-directory: apps/web
         run: npm run build
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -56,5 +58,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: CraftedJewelz-${{ matrix.os }}
-          path: dist/*
-
+          path: apps/web/dist/*
