@@ -1,48 +1,48 @@
 {
   "name": "craftedjewelz",
-  "version": "2.0.5",
-  "description": "CraftedJewelz – Desktop App for 3D Jewelry Design",
-  "author": "Supersonic Branded <support@supersonicbranded.com>",
-  "license": "MIT",
-  "main": "index.js",
+  "version": "2.0.6",
+  "description": "CraftedJewelz Desktop Application",
+  "author": "Supersonic Branded",
+  "main": "main.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
-  },
-  "scripts": {
-    "start": "electron .",
-    "dev": "electronmon .",
-    "build": "electron-builder"
-  },
-  "dependencies": {
-    "electronmon": "^2.0.2"
-  },
-  "devDependencies": {
-    "electron": "^30.5.1",
-    "electron-builder": "^24.13.3"
   },
   "build": {
     "appId": "com.supersonicbranded.craftedjewelz",
     "productName": "CraftedJewelz",
     "directories": {
+      "buildResources": "build",
       "output": "dist"
     },
     "files": [
       "**/*"
     ],
+    "extraResources": [
+      {
+        "from": "assets/",
+        "to": "assets",
+        "filter": ["**/*"]
+      }
+    ],
     "mac": {
-      "category": "public.app-category.utilities",
-      "icon": "apps/web/build/icons/appicon.icns",
-      "target": ["dmg", "zip"]
+      "category": "public.app-category.graphics-design",
+      "icon": "build/appicon2.icns"
     },
     "win": {
-      "icon": "apps/web/build/icons/appicon.ico",
-      "target": ["nsis", "zip"]
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/appicon2.ico"
     },
     "linux": {
-      "category": "Utility",
-      "icon": "apps/web/build/icons",
-      "target": ["AppImage", "deb"]
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/appicon2.png",
+      "category": "Utility"
     },
     "publish": [
       {
@@ -51,7 +51,19 @@
         "repo": "craftedjewelz-omega"
       }
     ]
-  }
+  },
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "build": "bash ./apps/web/build/convert-icons.sh && electron-builder --publish always"
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {}
 }
+
 
 
