@@ -1,46 +1,38 @@
 {
   "name": "craftedjewelz",
   "version": "1.0.0",
-  "private": true,
+  "description": "CraftedJewelz Desktop App",
   "main": "electron/main.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "electron": "electron electron/main.js"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "devDependencies": {
-    "vite": "^5.4.0",
-    "typescript": "^5.5.0",
-    "@types/react": "^18.2.66",
-    "@types/react-dom": "^18.2.22",
-    "electron": "^30.0.0",
+    "electron": "^30.5.1",
     "electron-builder": "^24.13.3"
   },
+  "dependencies": {},
   "build": {
-    "appId": "com.craftedjewelz.app",
+    "appId": "co.craftedjewelz.app",
     "productName": "CraftedJewelz",
     "directories": {
-      "buildResources": "build"
+      "buildResources": "apps/web/build/icons"
     },
     "files": [
       "dist/**/*",
       "electron/**/*"
     ],
     "mac": {
-      "target": "dmg",
-      "artifactName": "CraftedJewelz-${version}-mac.${ext}"
+      "icon": "apps/web/build/icons/appicon.icns",
+      "target": "dmg"
     },
     "win": {
-      "target": "nsis",
-      "artifactName": "CraftedJewelz-${version}-win.${ext}"
+      "icon": "apps/web/build/icons/appicon.ico",
+      "target": "nsis"
     },
     "linux": {
-      "target": "AppImage",
-      "artifactName": "CraftedJewelz-${version}-linux.${ext}"
+      "icon": "apps/web/build/icons",
+      "target": "AppImage"
     },
     "publish": [
       {
@@ -51,8 +43,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
-  },
-  "author": "supersonicbranded",
-  "license": "MIT"
+  }
 }
+
 
