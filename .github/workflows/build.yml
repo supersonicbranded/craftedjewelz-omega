@@ -3,7 +3,7 @@ name: Build & Publish Installers
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
 
 jobs:
   build:
@@ -16,46 +16,46 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # Install dependencies
-      - name: Install dependencies
-        working-directory: apps/web
-        run: npm install
+      - name: Ensure icons directory exists
+        run: |
+          if [ ! -d "apps/web/build/icons" ]; then
+            mkdir -p apps/web/build/icons
+          fi
+        shell: bash
 
-      # Install image tools (Linux)
-      - name: Install image tools (Linux)
-        if: runner.os == 'Linux'
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y imagemagick icnsutils graphicsmagick
+          sudo apt-get install -y imagemagick graphicsmagick icnsutils
 
-      # Install image tools (macOS)
-      - name: Install image tools (macOS)
-        if: runner.os == 'macOS'
+      - name: Install dependencies (macOS)
+        if: matrix.os == 'macos-latest'
         run: |
           brew install imagemagick graphicsmagick icoutils
 
-      # Prepare icons
-      - name: Prepare icons
-        run: |
-          mkdir -p apps/web/build/icons
-          convert assets/appicon2_512.png -resize 256x256 apps/web/build/icons/appicon2.png
-          convert assets/appicon2_512.png -resize 512x512 apps/web/build/icons/appicon512.png
+      - name: Install dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: choco install imagemagick graphicsmagick -y
 
-      # Build the app
-      - name: Build Electron App
+      - name: Install npm dependencies
         working-directory: apps/web
-        run: npm run build
+        run: npm install
+
+      - name: Build installers
+        working-directory: apps/web
+        run: npx electron-builder --publish always
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      # Upload artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: CraftedJewelz-${{ matrix.os }}
-          path: apps/web/dist/*
+          name: craftedjewelz-installers
+          path: apps/web/dist/**
+
