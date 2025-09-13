@@ -1,31 +1,35 @@
-c<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>CraftedJewelz</title>
   <style>
     body {
-      background: #111;
-      color: #fff;
+      margin: 0;
+      font-family: Arial, sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
       height: 100vh;
-      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
     }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #00ffcc;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+    h1 {
+      color: #00ff99;
     }
   </style>
 </head>
 <body>
-  <h1>CraftedJewelz App Running 🎉</h1>
-  <button onclick="alert(window.craftedAPI.ping())">Ping API</button>
+  <h1>✨ CraftedJewelz Desktop is Running! ✨</h1>
+  <p id="status">Loading...</p>
+
+  <script>
+    async function testPing() {
+      const response = await window.api.ping();
+      document.getElementById("status").innerText = "IPC Response: " + response;
+    }
+    testPing();
+  </script>
 </body>
 </html>
+
