@@ -1,19 +1,20 @@
-name: Build and Release
+name: Build & Release
 
 on:
   push:
     tags:
-      - "v*.*.*"
+      - 'v*'
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -22,17 +23,30 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        working-directory: apps/web
         run: npm install
-
-      - name: Build app
         working-directory: apps/web
-        run: npm run build
 
-      - name: Package Electron app
+      - name: Build frontend
+        run: npm run build
+        working-directory: apps/web
+
+      # Only run on Linux (used to generate icons for all platforms)
+      - name: Convert PNG to .icns and .ico
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y icnsutils imagemagick
+          mkdir -p apps/web/build/icons
+          cp apps/web/build/appicon2.png apps/web/build/icons/appicon.png
+          # Create ICNS for macOS
+          png2icns apps/web/build/icons/appicon.icns apps/web/build/appicon2.png
+          # Create ICO for Windows
+          convert apps/web/build/appicon2.png -resize 256x256 apps/web/build/icons/appicon.ico
+
+      - name: Build installers
+        run: npx electron-builder --publish always --x64
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --publish always --x64
 
 
