@@ -1,6 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
-const isDev = require("electron-is-dev");
 
 let mainWindow;
 
@@ -10,17 +9,14 @@ function createWindow() {
     height: 800,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      contextIsolation: true
     },
-    icon: path.join(__dirname, "build", "appicon2.png")
+    icon: path.join(__dirname, "build/icons/appicon.png")
   });
 
-  if (isDev) {
-    mainWindow.loadURL("http://localhost:3000");
-  } else {
-    mainWindow.loadFile(path.join(__dirname, "renderer", "dist", "index.html"));
-  }
+  // Load your app — replace with your local HTML or bundled React/Vite app
+  mainWindow.loadFile("index.html");
 
   mainWindow.on("closed", () => {
     mainWindow = null;
@@ -30,13 +26,19 @@ function createWindow() {
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
 
 app.on("activate", () => {
-  if (mainWindow === null) createWindow();
+  if (mainWindow === null) {
+    createWindow();
+  }
 });
 
-ipcMain.handle("ping", async () => "pong");
-
+// Example IPC for messages between renderer and main
+ipcMain.handle("app:getVersion", async () => {
+  return app.getVersion();
+});
 
