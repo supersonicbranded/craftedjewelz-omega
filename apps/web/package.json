@@ -1,48 +1,48 @@
 {
   "name": "craftedjewelz",
   "version": "2.0.5",
-  "description": "CraftedJewelz Omega desktop app",
-  "author": "Supersonic Branded",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "build": "electron-builder"
-  },
+  "description": "CraftedJewelz – Desktop App for 3D Jewelry Design",
+  "author": "Supersonic Branded <support@supersonicbranded.com>",
+  "license": "MIT",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electronmon .",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "electronmon": "^2.0.2"
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
+  },
   "build": {
     "appId": "com.supersonicbranded.craftedjewelz",
     "productName": "CraftedJewelz",
-    "files": [
-      "main.js",
-      "preload.js",
-      "index.html",
-      "renderer/**/*",
-      "assets/**/*",
-      "build/**/*",
-      "!node_modules/**/.cache",
-      "!dist"
-    ],
     "directories": {
-      "buildResources": "build"
+      "output": "dist"
     },
+    "files": [
+      "**/*"
+    ],
     "mac": {
-      "target": "dmg",
-      "icon": "build/icons/appicon.icns",
-      "category": "public.app-category.utilities"
+      "category": "public.app-category.utilities",
+      "icon": "apps/web/build/icons/appicon.icns",
+      "target": ["dmg", "zip"]
     },
     "win": {
-      "target": "nsis",
-      "icon": "build/icons/appicon.ico",
-      "artifactName": "CraftedJewelz-${version}-win.${ext}"
+      "icon": "apps/web/build/icons/appicon.ico",
+      "target": ["nsis", "zip"]
     },
     "linux": {
-      "target": "AppImage",
       "category": "Utility",
-      "icon": "build/icons",
-      "artifactName": "CraftedJewelz-${version}-linux.${ext}"
+      "icon": "apps/web/build/icons",
+      "target": ["AppImage", "deb"]
     },
     "publish": [
       {
@@ -51,10 +51,7 @@
         "repo": "craftedjewelz-omega"
       }
     ]
-  },
-  "devDependencies": {
-    "electron": "^30.5.1",
-    "electron-builder": "^24.13.3"
   }
 }
+
 
