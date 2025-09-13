@@ -1,5 +1,5 @@
-const { contextBridge } = require('electron');
+const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld('craftedAPI', {
-  ping: () => 'pong'
+contextBridge.exposeInMainWorld("electronAPI", {
+  getVersion: () => ipcRenderer.invoke("app:getVersion")
 });
