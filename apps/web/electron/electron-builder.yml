@@ -1,0 +1,50 @@
+appId: com.craftedjewelz.app
+productName: CraftedJewelz
+artifactName: "CraftedJewelz-${version}-${os}.${ext}"
+asar: true
+
+directories:
+  # relative to apps/web/
+  buildResources: build
+  output: dist
+
+# Make sure Electron's entry stays correct even when packaging
+extraMetadata:
+  main: electron/main.js
+
+files:
+  - dist/**
+  - electron/**
+
+mac:
+  target:
+    - dmg
+  icon: build/icons/appicon.icns
+  category: public.app-category.graphics-design
+
+# DMG customization (branding)
+dmg:
+  background: build/dmg-background.png   # <- put file at apps/web/build/dmg-background.png
+  icon: build/icons/appicon.icns
+  sign: false
+  contents:
+    - x: 130
+      y: 220
+      type: file
+      path: CraftedJewelz.app
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+
+win:
+  target: nsis
+  icon: build/icons/appicon.ico
+
+linux:
+  target: AppImage
+  icon: build/icons/appicon.png
+  category: Graphics
+
+publish:
+  - provider: github
