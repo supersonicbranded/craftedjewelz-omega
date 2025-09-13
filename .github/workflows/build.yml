@@ -1,18 +1,19 @@
-name: Build and Release
+name: Build & Auto-Publish CraftedJewelz
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main   # every push to main triggers
   workflow_dispatch:
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,26 +24,29 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        working-directory: apps/web
         run: npm install
+        working-directory: apps/web
 
-      - name: Prepare icons
-        if: matrix.os == 'ubuntu-latest'
+      - name: Auto bump version
+        id: version
         run: |
-          sudo apt-get update
-          sudo apt-get install -y icnsutils imagemagick
-          mkdir -p apps/web/build/icons
-          cp apps/web/build/appicon2.png apps/web/build/icons/appicon.png
-          # Create ICNS for macOS
-          png2icns apps/web/build/icons/appicon.icns apps/web/build/appicon2.png
-          # Create ICO for Windows
-          convert apps/web/build/appicon2.png -resize 256x256 apps/web/build/icons/appicon.ico
+          VERSION=$(npm --prefix apps/web version patch --no-git-tag-version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Build and Publish
+      - name: Build Electron app
+        run: npx electron-builder --publish always --x64
         working-directory: apps/web
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --publish always --x64
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: CraftedJewelz v${{ steps.version.outputs.version }}
+          files: apps/web/dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
 
 
