@@ -13,31 +13,28 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: 20
 
       - name: Install dependencies
-        working-directory: apps/web
         run: npm install
+        working-directory: apps/web
 
-      - name: Ensure icons
-        run: |
-          mkdir -p apps/web/build/icons
-          sudo apt-get update && sudo apt-get install -y imagemagick icnsutils
-          convert apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/appicon.png
-          convert apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/appicon_512.png
-          convert apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/appicon.ico
-          png2icns apps/web/build/icons/appicon.icns apps/web/build/icons/appicon_512.png
-
-      - name: Build & Publish
+      - name: Build Installers
+        run: npm run build
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --publish always
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: craftedjewelz-installers
+          path: apps/web/dist/**
 
 
