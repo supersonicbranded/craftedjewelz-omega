@@ -7,50 +7,64 @@ on:
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # Install dependencies for Linux
-      - name: Set up dependencies (Linux only)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y imagemagick icnsutils graphicsmagick
-
-      # Install dependencies for macOS
-      - name: Set up dependencies (macOS only)
-        if: runner.os == 'macOS'
-        run: |
-          brew install imagemagick icnsutils graphicsmagick
-
       - name: Install dependencies
         run: npm install
+        working-directory: apps/web
+
+      - name: Install ImageMagick (for icon resizing)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick icnsutils
 
       - name: Generate icons
         run: |
           mkdir -p apps/web/build/icons
-          cp apps/web/build/appicon2.png apps/web/build/icons/appicon.png
-          convert apps/web/build/appicon2.png -resize 256x256 apps/web/build/icons/256x256.png
+          convert apps/web/build/appicon2.png -resize 256x256 apps/web/build/icons/appicon.png
           convert apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/512x512.png
+          convert apps/web/build/appicon2.png -resize 1024x1024 apps/web/build/icons/1024x1024.png
+          # macOS .icns
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            mkdir -p apps/web/build/icons/mac.iconset
+            sips -z 16 16     apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_16x16.png
+            sips -z 32 32     apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_16x16@2x.png
+            sips -z 32 32     apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_32x32.png
+            sips -z 64 64     apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_32x32@2x.png
+            sips -z 128 128   apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_128x128.png
+            sips -z 256 256   apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_128x128@2x.png
+            sips -z 256 256   apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_256x256.png
+            sips -z 512 512   apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_256x256@2x.png
+            sips -z 512 512   apps/web/build/appicon2.png --out apps/web/build/icons/mac.iconset/icon_512x512.png
+            cp apps/web/build/appicon2.png apps/web/build/icons/mac.iconset/icon_512x512@2x.png
+            iconutil -c icns apps/web/build/icons/mac.iconset -o apps/web/build/icons/appicon.icns
+          fi
+          # Windows .ico
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            convert apps/web/build/appicon2.png -resize 256x256 apps/web/build/icons/appicon.ico
+          fi
 
-      - name: Build with Electron Builder
+      - name: Build and publish installers
+        run: npx electron-builder --publish always
+        working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx electron-builder --publish always
 
-      - name: Upload build artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: craftedjewelz-installers-${{ matrix.os }}
-          path: dist/*
+          name: CraftedJewelz-${{ matrix.os }}
+          path: apps/web/dist/*
