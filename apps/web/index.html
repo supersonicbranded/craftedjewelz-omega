@@ -1,35 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>CraftedJewelz</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: #111;
-      color: #fff;
-    }
-    h1 {
-      color: #00ff99;
-    }
-  </style>
-</head>
-<body>
-  <h1>✨ CraftedJewelz Desktop is Running! ✨</h1>
-  <p id="status">Loading...</p>
-
-  <script>
-    async function testPing() {
-      const response = await window.api.ping();
-      document.getElementById("status").innerText = "IPC Response: " + response;
-    }
-    testPing();
-  </script>
-</body>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>CraftedJewelz</title>
+  </head>
+  <body>
+    <h1>CraftedJewelz v2.0.7</h1>
+    <p id="version"></p>
+    <script>
+      window.electronAPI.getVersion().then((version) => {
+        document.getElementById("version").innerText =
+          "App Version: " + version;
+      });
+    </script>
+  </body>
 </html>
+
 
