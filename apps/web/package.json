@@ -1,52 +1,39 @@
 {
   "name": "craftedjewelz",
-  "version": "2.0.7",
-  "description": "CraftedJewelz desktop software for designing custom jewelry",
-  "author": "Supersonic Branded <support@craftedjewelz.com>",
-  "license": "MIT",
+  "version": "3.0.0",
+  "description": "CraftedJewelz Desktop App",
+  "author": "supersonicbranded",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electronmon .",
-    "build": "electron-builder",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
+    "build": "electron-builder"
   },
   "build": {
-    "appId": "com.craftedjewelz.app",
+    "appId": "com.supersonicbranded.craftedjewelz",
     "productName": "CraftedJewelz",
     "directories": {
+      "buildResources": "build",
       "output": "dist"
     },
     "files": [
-      "dist/**/*",
       "main.js",
       "preload.js",
+      "index.html",
       "package.json"
     ],
     "extraResources": [
-      {
-        "from": "assets/",
-        "to": "assets",
-        "filter": ["**/*"]
-      }
+      "assets/**"
     ],
     "mac": {
-      "target": ["dmg"],
-      "category": "public.app-category.graphics-design",
+      "target": ["dmg", "zip"],
       "icon": "build/icons/icon.icns"
     },
     "win": {
-      "target": ["nsis"],
+      "target": ["nsis", "zip"],
       "icon": "build/icons/icon.ico"
     },
     "linux": {
       "target": ["AppImage", "deb"],
-      "category": "Utility",
       "icon": "build/icons"
     },
     "publish": [
@@ -57,12 +44,18 @@
       }
     ]
   },
-  "dependencies": {
-    "electron-store": "^8.1.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   },
+  "license": "MIT",
   "devDependencies": {
     "electron": "^30.5.1",
-    "electron-builder": "^24.13.3",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {}
+}
+.3",
     "electronmon": "^2.0.2"
   }
 }
