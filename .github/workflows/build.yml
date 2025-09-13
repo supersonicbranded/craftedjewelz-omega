@@ -13,49 +13,43 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Ensure icons directory exists
-        run: |
-          if [ ! -d "apps/web/build/icons" ]; then
-            mkdir -p apps/web/build/icons
-          fi
-        shell: bash
-
-      - name: Install dependencies (Linux)
+      - name: Install dependencies (Linux only)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y imagemagick graphicsmagick icnsutils
+          sudo apt-get install -y icnsutils graphicsmagick imagemagick
 
-      - name: Install dependencies (macOS)
+      - name: Install dependencies (macOS only)
         if: matrix.os == 'macos-latest'
         run: |
           brew install imagemagick graphicsmagick icoutils
 
-      - name: Install dependencies (Windows)
-        if: matrix.os == 'windows-latest'
-        run: choco install imagemagick graphicsmagick -y
+      - name: Ensure assets folder exists
+        run: |
+          mkdir -p apps/web/assets
+          mkdir -p apps/web/build/icons
+          echo "Ensured assets and icons folders exist."
 
       - name: Install npm dependencies
         working-directory: apps/web
         run: npm install
 
-      - name: Build installers
+      - name: Build Electron App
         working-directory: apps/web
-        run: npx electron-builder --publish always
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npm run build
 
-      - name: Upload build artifacts
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: craftedjewelz-installers
+          name: CraftedJewelz-${{ matrix.os }}
           path: apps/web/dist/**
-
