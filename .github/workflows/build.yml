@@ -1,4 +1,4 @@
-name: Build & Publish Installers
+name: Build & Release
 
 on:
   push:
@@ -10,43 +10,57 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
+      # 1. Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: apps/web
-
-      # Fix: don’t fail if icons folder already exists
-      - name: Ensure build/icons folder exists
-        shell: bash
+      # 3. Setup system deps for icons (Linux & macOS only)
+      - name: Install system deps (Linux)
+        if: runner.os == 'Linux'
         run: |
-          if [ ! -d "apps/web/build/icons" ]; then
-            mkdir -p apps/web/build/icons
+          sudo apt-get update
+          sudo apt-get install -y imagemagick graphicsmagick icoutils
+
+      - name: Install system deps (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install imagemagick graphicsmagick icoutils || true
+
+      # 4. Ensure icons directory & resize main icon
+      - name: Prepare icons
+        run: |
+          mkdir -p apps/web/build/icons
+          cp -f apps/web/build/appicon.png apps/web/build/icons/appicon.png || true
+          if [ -f "apps/web/build/appicon.png" ]; then
+            magick apps/web/build/appicon.png -resize 512x512\! apps/web/build/icons/appicon.png
           fi
 
-      # Copy your 512x512 icon into the icons folder
-      - name: Copy appicon2.png
-        run: |
-          cp apps/web/build/appicon2.png apps/web/build/icons/appicon.png
+      # 5. Install deps
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm install
 
-      - name: Build installers
-        run: npm run build
+      # 6. Build installers
+      - name: Build with electron-builder
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npm run build
 
-      - name: Upload artifacts
+      # 7. Upload build artifacts
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: CraftedJewelz-${{ matrix.os }}
+          name: ${{ runner.os }}-craftedjewelz
           path: apps/web/dist/**
