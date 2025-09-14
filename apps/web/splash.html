@@ -2,106 +2,58 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>CraftedJewelz – Loading</title>
+    <title>CraftedJewelz — Loading</title>
     <style>
-      :root {
-        --bg: rgba(11, 11, 12, 0.0);
-        --panel: rgba(20, 20, 24, 0.88);
-        --gold: #d4af37;
-        --green: #19b97c;
-        --text: #e9e9ec;
-      }
-      html, body {
-        margin: 0;
-        padding: 0;
-        background: var(--bg);
-      }
-      .wrap {
-        position: fixed;
-        inset: 0;
+      @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-6px); } 100% { transform: translateY(0); } }
+      html, body { height: 100%; margin: 0; }
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        background: #0b0b0d;
+        color: #fafafa;
         display: grid;
         place-items: center;
       }
-      .card {
-        width: 560px;
-        height: 260px;
+      .box {
+        width: 440px;
+        max-width: 92%;
+        padding: 28px 24px;
         border-radius: 16px;
-        background: var(--panel);
-        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-        display: grid;
-        grid-template-rows: 1fr auto;
-        overflow: hidden;
-      }
-      .top {
-        display: grid;
-        place-items: center;
-        gap: 8px;
+        background: linear-gradient(180deg, #111114 0%, #0c0c0f 100%);
+        border: 1px solid #1c1c21;
+        box-shadow: 0 20px 60px rgba(0,0,0,.45);
       }
       .logo {
-        width: 84px;
-        height: 84px;
-        background: radial-gradient(circle at 35% 35%, var(--green), #0f6b4f);
-        border-radius: 22%;
-        position: relative;
-        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.06);
+        display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
       }
-      .logo::before {
-        content: "C";
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        translate: -64% -58%;
-        font: 700 60px/1 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-        color: var(--green);
-        text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      .brand {
+        font-weight: 700; font-size: 18px; letter-spacing: .3px;
       }
-      .logo::after {
-        content: "J";
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        translate: -6% -10%;
-        font: 700 60px/1 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-        color: var(--gold);
-        text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      .progress {
+        height: 8px; background: #15151a; border-radius: 999px; overflow: hidden; position: relative;
       }
-      h1 {
-        margin: 10px 0 0;
-        font: 700 22px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-        color: var(--text);
-        letter-spacing: 0.3px;
+      .progress::before {
+        content: ""; position: absolute; inset: 0; width: 38%;
+        background: linear-gradient(90deg, #22d3ee 0%, #a78bfa 50%, #22d3ee 100%);
+        animation: slide 1.4s infinite linear;
       }
-      .sub {
-        margin: 6px 0 0;
-        color: #a7a8ad;
-        font: 500 12px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      }
-      .bar {
-        height: 5px;
-        background: linear-gradient(90deg, var(--green), var(--gold));
-        width: 0%;
-        animation: load 1.15s ease-in-out forwards;
-      }
-      @keyframes load {
-        to { width: 100%; }
-      }
-      .footer {
-        height: 8px;
-        background: rgba(255,255,255,0.06);
+      @keyframes slide { 0% { left: -38%; } 100% { left: 100%; } }
+      .hint { margin-top: 12px; font-size: 12px; color: #9ca3af; }
+      .gem {
+        width: 32px; height: 32px; border-radius: 8px; background: radial-gradient(100% 100% at 50% 0%, #22d3ee 0%, #a78bfa 100%);
+        filter: drop-shadow(0 6px 18px rgba(34,211,238,.35));
+        animation: float 3s ease-in-out infinite;
       }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <div class="card">
-        <div class="top">
-          <div class="logo"></div>
-          <h1>CraftedJewelz</h1>
-          <div class="sub">Initializing studio modules…</div>
-          <div class="bar"></div>
-        </div>
-        <div class="footer"></div>
+    <div class="box">
+      <div class="logo">
+        <div class="gem"></div>
+        <div class="brand">CraftedJewelz</div>
       </div>
+      <div class="progress"></div>
+      <div class="hint">Loading workspace…</div>
     </div>
   </body>
 </html>
+
