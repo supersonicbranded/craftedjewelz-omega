@@ -1,9 +1,9 @@
-name: Build & Release CraftedJewelz
+name: Build & Publish Installers
 
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
 
 jobs:
   build:
@@ -20,34 +20,33 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: "npm"
 
       - name: Install dependencies
-        run: |
-          cd apps/web
-          npm install
+        run: npm install
+        working-directory: apps/web
 
-      - name: Ensure build directories
-        run: |
-          mkdir -p apps/web/build/icons
-          mkdir -p apps/web/assets
-
-      - name: Copy provided 512x512 appicon2.png into icons
-        run: |
-          cp apps/web/build/appicon2.png apps/web/build/icons/icon.png
-          cp apps/web/build/appicon2.png apps/web/build/icons/icon.icns
-          cp apps/web/build/appicon2.png apps/web/build/icons/icon.ico
+      # Fix: don’t fail if icons folder already exists
+      - name: Ensure build/icons folder exists
         shell: bash
-
-      - name: Build Electron App
         run: |
-          cd apps/web
-          npm run build
+          if [ ! -d "apps/web/build/icons" ]; then
+            mkdir -p apps/web/build/icons
+          fi
+
+      # Copy your 512x512 icon into the icons folder
+      - name: Copy appicon2.png
+        run: |
+          cp apps/web/build/appicon2.png apps/web/build/icons/appicon.png
+
+      - name: Build installers
+        run: npm run build
+        working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: craftedjewelz-build-${{ matrix.os }}
-          path: apps/web/dist/*
-
+          name: CraftedJewelz-${{ matrix.os }}
+          path: apps/web/dist/**
