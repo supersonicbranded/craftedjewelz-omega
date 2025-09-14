@@ -1,55 +1,47 @@
 {
   "name": "craftedjewelz",
   "version": "3.0.2",
-  "description": "CraftedJewelz – Professional Jewelry Design & CAD Platform",
+  "description": "CraftedJewelz Desktop Application",
   "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "dev": "electron .",
-    "build": "electron-builder"
-  },
   "author": {
     "name": "Supersonic Branded",
     "email": "support@craftedjewelz.com"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   },
-  "dependencies": {
-    "electron-store": "^8.1.0"
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
   },
+  "dependencies": {},
   "devDependencies": {
-    "electron": "^30.5.1",
+    "electron": "30.5.1",
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.craftedjewelz.desktop",
+    "appId": "com.supersonicbranded.craftedjewelz",
     "productName": "CraftedJewelz",
     "files": [
       "dist/**/*",
       "main.js",
       "preload.js",
-      "index.html",
-      "assets/**/*",
-      "build/**/*"
+      "package.json"
     ],
     "directories": {
-      "buildResources": "build"
+      "buildResources": "apps/web/build/icons"
     },
     "mac": {
-      "category": "public.app-category.graphics-design",
-      "icon": "build/appicon2.icns",
+      "icon": "apps/web/build/icons/icon.icns",
       "target": ["dmg", "zip"]
     },
     "win": {
-      "icon": "build/appicon2.ico",
+      "icon": "apps/web/build/icons/icon.ico",
       "target": ["nsis", "zip"]
     },
     "linux": {
-      "category": "Utility",
-      "icon": "build/appicon2.png",
+      "icon": "apps/web/build/icons",
       "target": ["AppImage", "deb"]
     },
     "publish": [
