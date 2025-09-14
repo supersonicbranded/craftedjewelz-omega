@@ -1,62 +1,94 @@
 {
   "name": "craftedjewelz",
-  "version": "3.0.2",
-  "description": "CraftedJewelz desktop application",
+  "version": "3.1.0",
+  "description": "CraftedJewelz desktop app with a polished Photoshop-style welcome experience.",
   "author": {
-    "name": "Supersonic Branded",
-    "email": "support@craftedjewelz.com"
+    "name": "SupersonicBranded",
+    "email": "support@supersonicbranded.com"
+  },
+  "license": "MIT",
+  "private": true,
+  "main": "electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n VITE,ELECTRON -c blue,magenta \"cross-env VITE_DEV_SERVER=true vite\" \"wait-on tcp:5173 && electron .\"",
+    "build:renderer": "vite build",
+    "build": "npm run build:renderer && electron-builder",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.2",
+    "concurrently": "^9.0.1",
+    "cross-env": "^7.0.3",
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.3",
+    "wait-on": "^8.0.1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   },
-  "license": "MIT",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "build": "electron-builder"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "electron": "^30.5.1",
-    "electron-builder": "^24.13.3"
-  },
   "build": {
-    "appId": "com.craftedjewelz.app",
+    "appId": "co.craftedjewelz.desktop",
     "productName": "CraftedJewelz",
-    "directories": {
-      "buildResources": "apps/web/build",
-      "output": "dist"
-    },
     "files": [
-      "**/*"
+      "electron/**/*",
+      "dist/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "extraResources": [
+      {
+        "from": "assets",
+        "to": "assets"
+      }
     ],
     "mac": {
-      "category": "public.app-category.utilities",
-      "icon": "apps/web/build/appicon2.png"
+      "category": "public.app-category.graphics-design",
+      "target": [
+        "dmg"
+      ],
+      "icon": "build/icons/appicon.icns",
+      "artifactName": "CraftedJewelz-${version}.${ext}"
     },
     "win": {
-      "icon": "apps/web/build/appicon2.png",
       "target": [
-        "nsis",
-        "zip"
-      ]
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icons/appicon.ico",
+      "artifactName": "CraftedJewelz-Setup-${version}.${ext}"
     },
     "linux": {
-      "category": "Utility",
-      "icon": "apps/web/build/appicon2.png",
+      "category": "Graphics",
       "target": [
         "AppImage",
         "deb"
       ],
-      "maintainer": "Supersonic Branded <support@craftedjewelz.com>"
+      "icon": "build/icons/appicon.png",
+      "artifactName": "craftedjewelz_${version}_${arch}.${ext}"
     },
     "publish": [
       {
         "provider": "github",
         "owner": "supersonicbranded",
-        "repo": "craftedjewelz-omega"
+        "repo": "craftedjewelz-omega",
+        "releaseType": "draft"
       }
     ]
   }
 }
+
