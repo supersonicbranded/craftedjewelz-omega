@@ -31,12 +31,11 @@ jobs:
           mkdir -p apps/web/build/icons
           mkdir -p apps/web/assets
 
-      - name: Normalize base appicon2.png
+      - name: Copy provided 512x512 appicon2.png into icons
         run: |
-          magick apps/web/build/appicon2.png -resize 512x512\! apps/web/build/appicon2.png
-          magick apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.png
-          magick apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.icns
-          magick apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.ico
+          cp apps/web/build/appicon2.png apps/web/build/icons/icon.png
+          cp apps/web/build/appicon2.png apps/web/build/icons/icon.icns
+          cp apps/web/build/appicon2.png apps/web/build/icons/icon.ico
         shell: bash
 
       - name: Build Electron App
@@ -51,3 +50,4 @@ jobs:
         with:
           name: craftedjewelz-build-${{ matrix.os }}
           path: apps/web/dist/*
+
