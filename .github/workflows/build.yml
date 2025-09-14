@@ -3,64 +3,41 @@ name: Build & Release
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
+    runs-on: ${{ matrix.os }}
+
     steps:
-      # 1. Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
+          cache: npm
           cache-dependency-path: apps/web/package-lock.json
 
-      # 3. Setup system deps for icons (Linux & macOS only)
-      - name: Install system deps (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y imagemagick graphicsmagick icoutils
-
-      - name: Install system deps (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew install imagemagick graphicsmagick icoutils || true
-
-      # 4. Ensure icons directory & resize main icon
-      - name: Prepare icons
-        run: |
-          mkdir -p apps/web/build/icons
-          cp -f apps/web/build/appicon.png apps/web/build/icons/appicon.png || true
-          if [ -f "apps/web/build/appicon.png" ]; then
-            magick apps/web/build/appicon.png -resize 512x512\! apps/web/build/icons/appicon.png
-          fi
-
-      # 5. Install deps
       - name: Install dependencies
-        working-directory: apps/web
-        run: npm install
+        run: |
+          cd apps/web
+          npm ci
 
-      # 6. Build installers
-      - name: Build with electron-builder
-        working-directory: apps/web
+      - name: Build app
+        run: |
+          cd apps/web
+          npm run build
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npm run build
 
-      # 7. Upload build artifacts
-      - name: Upload Artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}-craftedjewelz
+          name: craftedjewelz-${{ matrix.os }}
           path: apps/web/dist/**
