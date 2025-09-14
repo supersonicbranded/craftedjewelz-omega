@@ -1,6 +1,6 @@
 {
   "name": "craftedjewelz",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "CraftedJewelz Desktop App",
   "author": "supersonicbranded",
   "main": "main.js",
@@ -55,8 +55,3 @@
   },
   "dependencies": {}
 }
-.3",
-    "electronmon": "^2.0.2"
-  }
-}
-
