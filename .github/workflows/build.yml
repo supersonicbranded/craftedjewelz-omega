@@ -25,30 +25,36 @@ jobs:
         run: npm install
         working-directory: apps/web
 
-      # Linux: install Imagemagick + icoutils
+      # Linux
       - name: Install tools (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick icoutils
 
-      # macOS: install Imagemagick
+      # macOS
       - name: Install tools (macOS)
         if: runner.os == 'macOS'
         run: |
           brew install imagemagick icoutils || true
 
-      # Windows: install Imagemagick
+      # Windows
       - name: Install tools (Windows)
         if: runner.os == 'Windows'
         run: choco install imagemagick -y
 
-      # Generate icons cross-platform
+      # Create build/icons folder cross-platform
+      - name: Create icons directory
+        run: |
+          mkdir -p apps/web/build/icons || true
+        shell: bash
+
+      # Generate icons
       - name: Generate app icons
         run: |
-          mkdir -p apps/web/build/icons
           magick convert apps/web/build/appicon2.png -resize 512x512! apps/web/build/icons/appicon.png
           magick convert apps/web/build/icons/appicon.png -define icon:auto-resize=256,128,64,48,32,16 apps/web/build/icons/appicon.ico
+        shell: bash
 
       - name: Build Electron App
         run: npm run build
