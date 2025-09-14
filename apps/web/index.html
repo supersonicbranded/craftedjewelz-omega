@@ -1,19 +1,19 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <title>CraftedJewelz</title>
+    <link rel="icon" href="/favicon.ico" />
   </head>
   <body>
-    <h1>CraftedJewelz v2.0.7</h1>
-    <p id="version"></p>
-    <script>
-      window.electronAPI.getVersion().then((version) => {
-        document.getElementById("version").innerText =
-          "App Version: " + version;
-      });
-    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+
 
 
