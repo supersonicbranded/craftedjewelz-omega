@@ -25,35 +25,40 @@ jobs:
         run: npm install
         working-directory: apps/web
 
-      # Linux
-      - name: Install tools (Linux)
+      # Linux setup
+      - name: Install ImageMagick on Linux
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick icoutils
+          which magick || which convert
 
-      # macOS
-      - name: Install tools (macOS)
+      # macOS setup
+      - name: Install ImageMagick on macOS
         if: runner.os == 'macOS'
         run: |
           brew install imagemagick icoutils || true
+          which magick || which convert
 
-      # Windows
-      - name: Install tools (Windows)
+      # Windows setup
+      - name: Install ImageMagick on Windows
         if: runner.os == 'Windows'
-        run: choco install imagemagick -y
-
-      # Create build/icons folder cross-platform
-      - name: Create icons directory
         run: |
-          mkdir -p apps/web/build/icons || true
+          choco install imagemagick -y --no-progress
+          refreshenv
+          where magick
+
+      # Make sure icons folder exists (cross-platform safe)
+      - name: Create icons directory
+        run: mkdir -p apps/web/build/icons
         shell: bash
 
-      # Generate icons
+      # Generate icons (force use of `magick` or fallback `convert`)
       - name: Generate app icons
         run: |
-          magick convert apps/web/build/appicon2.png -resize 512x512! apps/web/build/icons/appicon.png
-          magick convert apps/web/build/icons/appicon.png -define icon:auto-resize=256,128,64,48,32,16 apps/web/build/icons/appicon.ico
+          IMG_CMD=$(command -v magick || command -v convert)
+          $IMG_CMD apps/web/build/appicon2.png -resize 512x512! apps/web/build/icons/appicon.png
+          $IMG_CMD apps/web/build/icons/appicon.png -define icon:auto-resize=256,128,64,48,32,16 apps/web/build/icons/appicon.ico
         shell: bash
 
       - name: Build Electron App
