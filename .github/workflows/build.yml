@@ -25,21 +25,39 @@ jobs:
         run: npm install
         working-directory: apps/web
 
-      # 🆕 Auto-resize icons step (prevents icon size errors forever)
-      - name: Ensure icon size is at least 256x256
+      # 🆕 Icon preparation step
+      - name: Generate icons
         run: |
-          mkdir -p apps/web/build
-          # Install imagemagick depending on runner
+          mkdir -p apps/web/build/icons
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo apt-get update && sudo apt-get install -y imagemagick
+            sudo apt-get update && sudo apt-get install -y imagemagick icoutils
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            brew install imagemagick
+            brew install imagemagick icoutils
           fi
-          # Resize appicon2.png to 512x512 (only if smaller)
+
           if [ -f apps/web/build/appicon2.png ]; then
-            convert apps/web/build/appicon2.png -resize 512x512\> apps/web/build/appicon2.png
+            echo "✅ Resizing base appicon2.png..."
+            convert apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.png
+
+            echo "✅ Creating Windows ICO..."
+            convert apps/web/build/icons/icon.png -define icon:auto-resize apps/web/build/icons/icon.ico
+
+            echo "✅ Creating macOS ICNS..."
+            mkdir -p apps/web/build/icons/mac.iconset
+            sips -z 16 16     apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_16x16.png
+            sips -z 32 32     apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_16x16@2x.png
+            sips -z 32 32     apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_32x32.png
+            sips -z 64 64     apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_32x32@2x.png
+            sips -z 128 128   apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_128x128.png
+            sips -z 256 256   apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_128x128@2x.png
+            sips -z 256 256   apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_256x256.png
+            sips -z 512 512   apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_256x256@2x.png
+            sips -z 512 512   apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_512x512.png
+            cp apps/web/build/icons/icon.png apps/web/build/icons/icon_512x512@2x.png
+            iconutil -c icns apps/web/build/icons/mac.iconset -o apps/web/build/icons/icon.icns
+            rm -rf apps/web/build/icons/mac.iconset
           else
-            echo "❌ appicon2.png not found!"
+            echo "❌ apps/web/build/appicon2.png not found!"
             exit 1
           fi
 
@@ -54,4 +72,3 @@ jobs:
         with:
           name: craftedjewelz-${{ runner.os }}
           path: apps/web/dist/**
-
