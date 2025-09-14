@@ -1,19 +1,19 @@
-name: Build & Publish Installers
+name: Build & Release CraftedJewelz
 
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -21,53 +21,33 @@ jobs:
         with:
           node-version: 20
 
-      # --- Install dependencies for icon resizing ---
-      - name: Install dependencies (Linux)
-        if: runner.os == 'Linux'
+      - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y imagemagick icnsutils graphicsmagick
+          cd apps/web
+          npm install
 
-      - name: Install dependencies (macOS)
-        if: runner.os == 'macOS'
+      - name: Ensure build directories
         run: |
-          brew install imagemagick graphicsmagick
-          # icnsutils not available in brew, imagemagick handles .icns
+          mkdir -p apps/web/build/icons
+          mkdir -p apps/web/assets
 
-      - name: Install dependencies (Windows)
-        if: runner.os == 'Windows'
-        run: choco install imagemagick --yes --no-progress
-
-      # --- Safe mkdir ---
-      - name: Create icons directory (cross-platform safe)
+      - name: Normalize base appicon2.png
         run: |
-          if [ ! -d "apps/web/build/icons" ]; then
-            mkdir -p apps/web/build/icons
-          fi
-        shell: bash
-
-      # --- Resize appicon2.png into required sizes ---
-      - name: Generate icons
-        run: |
+          magick apps/web/build/appicon2.png -resize 512x512\! apps/web/build/appicon2.png
           magick apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.png
           magick apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.icns
           magick apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.ico
         shell: bash
 
-      # --- Install dependencies & build ---
-      - name: Install npm deps
-        working-directory: apps/web
-        run: npm install
-
-      - name: Build with electron-builder
-        working-directory: apps/web
+      - name: Build Electron App
+        run: |
+          cd apps/web
+          npm run build
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npm run build
 
-      # --- Upload artifacts ---
-      - name: Upload build artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: CraftedJewelz-installers
+          name: craftedjewelz-build-${{ matrix.os }}
           path: apps/web/dist/*
