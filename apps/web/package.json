@@ -1,8 +1,7 @@
-{
+{{
   "name": "craftedjewelz",
   "version": "3.0.2",
-  "description": "CraftedJewelz Desktop Application",
-  "main": "main.js",
+  "description": "CraftedJewelz desktop application",
   "author": {
     "name": "Supersonic Branded",
     "email": "support@craftedjewelz.com"
@@ -11,38 +10,46 @@
     "type": "git",
     "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   },
+  "license": "MIT",
+  "main": "main.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder"
   },
   "dependencies": {},
   "devDependencies": {
-    "electron": "30.5.1",
+    "electron": "^30.5.1",
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.supersonicbranded.craftedjewelz",
+    "appId": "com.craftedjewelz.app",
     "productName": "CraftedJewelz",
-    "files": [
-      "dist/**/*",
-      "main.js",
-      "preload.js",
-      "package.json"
-    ],
     "directories": {
-      "buildResources": "apps/web/build/icons"
+      "buildResources": "apps/web/build",
+      "output": "dist"
     },
+    "files": [
+      "**/*"
+    ],
     "mac": {
-      "icon": "apps/web/build/icons/icon.icns",
-      "target": ["dmg", "zip"]
+      "category": "public.app-category.utilities",
+      "icon": "apps/web/build/appicon2.png"
     },
     "win": {
-      "icon": "apps/web/build/icons/icon.ico",
-      "target": ["nsis", "zip"]
+      "icon": "apps/web/build/appicon2.png",
+      "target": [
+        "nsis",
+        "zip"
+      ]
     },
     "linux": {
-      "icon": "apps/web/build/icons",
-      "target": ["AppImage", "deb"]
+      "category": "Utility",
+      "icon": "apps/web/build/appicon2.png",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "maintainer": "Supersonic Branded <support@craftedjewelz.com>"
     },
     "publish": [
       {
@@ -53,3 +60,4 @@
     ]
   }
 }
+
