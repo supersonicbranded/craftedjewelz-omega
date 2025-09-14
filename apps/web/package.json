@@ -1,8 +1,11 @@
 {
   "name": "craftedjewelz",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "CraftedJewelz Desktop App",
-  "author": "supersonicbranded",
+  "author": {
+    "name": "supersonicbranded",
+    "email": "support@craftedjewelz.com"
+  },
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -34,7 +37,9 @@
     },
     "linux": {
       "target": ["AppImage", "deb"],
-      "icon": "build/icons"
+      "maintainer": "supersonicbranded <support@craftedjewelz.com>",
+      "icon": "build/icons",
+      "category": "Utility"
     },
     "publish": [
       {
