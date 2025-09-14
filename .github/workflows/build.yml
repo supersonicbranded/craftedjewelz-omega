@@ -1,19 +1,19 @@
-name: Build & Release
+name: Build & Publish Installers
 
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -21,54 +21,53 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: apps/web
-
-      # Linux setup
-      - name: Install ImageMagick on Linux
+      # --- Install dependencies for icon resizing ---
+      - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y imagemagick icoutils
-          which magick || which convert
+          sudo apt-get install -y imagemagick icnsutils graphicsmagick
 
-      # macOS setup
-      - name: Install ImageMagick on macOS
+      - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew install imagemagick icoutils || true
-          which magick || which convert
+          brew install imagemagick graphicsmagick
+          # icnsutils not available in brew, imagemagick handles .icns
 
-      # Windows setup
-      - name: Install ImageMagick on Windows
+      - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
-        run: |
-          choco install imagemagick -y --no-progress
-          refreshenv
-          where magick
+        run: choco install imagemagick --yes --no-progress
 
-      # Make sure icons folder exists (cross-platform safe)
-      - name: Create icons directory
-        run: mkdir -p apps/web/build/icons
+      # --- Safe mkdir ---
+      - name: Create icons directory (cross-platform safe)
+        run: |
+          if [ ! -d "apps/web/build/icons" ]; then
+            mkdir -p apps/web/build/icons
+          fi
         shell: bash
 
-      # Generate icons (force use of `magick` or fallback `convert`)
-      - name: Generate app icons
+      # --- Resize appicon2.png into required sizes ---
+      - name: Generate icons
         run: |
-          IMG_CMD=$(command -v magick || command -v convert)
-          $IMG_CMD apps/web/build/appicon2.png -resize 512x512! apps/web/build/icons/appicon.png
-          $IMG_CMD apps/web/build/icons/appicon.png -define icon:auto-resize=256,128,64,48,32,16 apps/web/build/icons/appicon.ico
+          magick apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.png
+          magick apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.icns
+          magick apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.ico
         shell: bash
 
-      - name: Build Electron App
-        run: npm run build
+      # --- Install dependencies & build ---
+      - name: Install npm deps
+        working-directory: apps/web
+        run: npm install
+
+      - name: Build with electron-builder
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npm run build
 
-      - name: Upload Artifacts
+      # --- Upload artifacts ---
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: craftedjewelz-${{ runner.os }}
-          path: apps/web/dist/**
+          name: CraftedJewelz-installers
+          path: apps/web/dist/*
