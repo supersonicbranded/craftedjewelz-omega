@@ -1,4 +1,4 @@
-{{
+{
   "name": "craftedjewelz",
   "version": "3.0.2",
   "description": "CraftedJewelz desktop application",
@@ -60,4 +60,3 @@
     ]
   }
 }
-
