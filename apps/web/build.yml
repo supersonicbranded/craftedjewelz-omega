@@ -3,30 +3,46 @@ name: Build & Publish Installers
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Use Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install dependencies
-        working-directory: apps/web
         run: npm install
-
-      - name: Build Electron app
         working-directory: apps/web
-        run: npm run build
+
+      - name: Ensure asset directories exist
+        run: |
+          node -e "require('fs').mkdirSync('apps/web/build/icons', { recursive: true }); require('fs').mkdirSync('apps/web/assets', { recursive: true });"
+
+      - name: Copy application icons
+        run: |
+          cp apps/web/build/appicon2_512.png apps/web/build/icons/appicon.png || echo "Icon already in place"
+          cp apps/web/build/appicon2_512.png apps/web/build/icons/appicon2.png || echo "Icon already in place"
+        shell: bash
+
+      - name: Build & Publish
+        run: npx electron-builder --publish always
+        working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CraftedJewelz-${{ matrix.os }}
+          path: apps/web/dist/**
