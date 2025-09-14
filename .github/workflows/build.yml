@@ -25,41 +25,30 @@ jobs:
         run: npm install
         working-directory: apps/web
 
-      # 🆕 Icon preparation step
-      - name: Generate icons
+      # Linux: install Imagemagick + icoutils
+      - name: Install tools (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick icoutils
+
+      # macOS: install Imagemagick
+      - name: Install tools (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install imagemagick icoutils || true
+
+      # Windows: install Imagemagick
+      - name: Install tools (Windows)
+        if: runner.os == 'Windows'
+        run: choco install imagemagick -y
+
+      # Generate icons cross-platform
+      - name: Generate app icons
         run: |
           mkdir -p apps/web/build/icons
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo apt-get update && sudo apt-get install -y imagemagick icoutils
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            brew install imagemagick icoutils
-          fi
-
-          if [ -f apps/web/build/appicon2.png ]; then
-            echo "✅ Resizing base appicon2.png..."
-            convert apps/web/build/appicon2.png -resize 512x512 apps/web/build/icons/icon.png
-
-            echo "✅ Creating Windows ICO..."
-            convert apps/web/build/icons/icon.png -define icon:auto-resize apps/web/build/icons/icon.ico
-
-            echo "✅ Creating macOS ICNS..."
-            mkdir -p apps/web/build/icons/mac.iconset
-            sips -z 16 16     apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_16x16.png
-            sips -z 32 32     apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_16x16@2x.png
-            sips -z 32 32     apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_32x32.png
-            sips -z 64 64     apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_32x32@2x.png
-            sips -z 128 128   apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_128x128.png
-            sips -z 256 256   apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_128x128@2x.png
-            sips -z 256 256   apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_256x256.png
-            sips -z 512 512   apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_256x256@2x.png
-            sips -z 512 512   apps/web/build/icons/icon.png --out apps/web/build/icons/mac.iconset/icon_512x512.png
-            cp apps/web/build/icons/icon.png apps/web/build/icons/icon_512x512@2x.png
-            iconutil -c icns apps/web/build/icons/mac.iconset -o apps/web/build/icons/icon.icns
-            rm -rf apps/web/build/icons/mac.iconset
-          else
-            echo "❌ apps/web/build/appicon2.png not found!"
-            exit 1
-          fi
+          magick convert apps/web/build/appicon2.png -resize 512x512! apps/web/build/icons/appicon.png
+          magick convert apps/web/build/icons/appicon.png -define icon:auto-resize=256,128,64,48,32,16 apps/web/build/icons/appicon.ico
 
       - name: Build Electron App
         run: npm run build
