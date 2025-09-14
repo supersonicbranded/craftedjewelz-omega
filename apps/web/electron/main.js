@@ -1,54 +1,44 @@
-import { app, BrowserWindow, nativeImage, ipcMain } from "electron";
-import path from "path";
+import { app, BrowserWindow, ipcMain, nativeTheme, shell } from "electron";
 import { fileURLToPath } from "url";
+import path from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const isDev = process.env.VITE_DEV_SERVER === "true";
+let splashWindow = null;
+let mainWindow = null;
 
-let splashWin = null;
-let mainWin = null;
+const isDev = !!process.env.VITE_DEV_SERVER_URL;
 
-function loadIcon(file) {
-  try {
-    const p = path.resolve(__dirname, "..", "build", "icons", file);
-    const img = nativeImage.createFromPath(p);
-    return img.isEmpty() ? undefined : img;
-  } catch {
-    return undefined;
-  }
-}
-
-async function createSplash() {
-  splashWin = new BrowserWindow({
-    width: 640,
+function createSplash() {
+  splashWindow = new BrowserWindow({
+    width: 560,
     height: 360,
     frame: false,
-    transparent: true,
-    alwaysOnTop: true,
     resizable: false,
+    movable: true,
+    transparent: false,
+    backgroundColor: nativeTheme.shouldUseDarkColors ? "#09090b" : "#ffffff",
     show: false,
-    icon: loadIcon(process.platform === "win32" ? "appicon.ico" : "appicon.png")
+    alwaysOnTop: true
   });
 
-  const splashUrl = new URL("../splash.html", import.meta.url).toString();
-  await splashWin.loadURL(splashUrl);
-  splashWin.once("ready-to-show", () => splashWin?.show());
+  // Load local splash.html that we ship via extraResources
+  splashWindow.loadFile(path.join(app.getAppPath(), "splash.html")).catch(() => {});
+  splashWindow.once("ready-to-show", () => splashWindow.show());
 }
 
-async function createMainWindow() {
-  mainWin = new BrowserWindow({
-    width: 1280,
-    height: 800,
+function createMainWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1320,
+    height: 860,
     minWidth: 1100,
     minHeight: 720,
+    backgroundColor: nativeTheme.shouldUseDarkColors ? "#0b0b0d" : "#f7f7f8",
     show: false,
-    backgroundColor: "#0b0b0c",
     title: "CraftedJewelz",
-    icon: loadIcon(process.platform === "win32" ? "appicon.ico" : "appicon.png"),
     webPreferences: {
-      preload: path.resolve(__dirname, "preload.js"),
+      preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true
@@ -56,42 +46,46 @@ async function createMainWindow() {
   });
 
   if (isDev) {
-    await mainWin.loadURL("http://localhost:5173");
-    mainWin.webContents.openDevTools({ mode: "detach" });
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
-    const indexHtml = new URL("../dist/index.html", import.meta.url).toString();
-    await mainWin.loadURL(indexHtml);
+    // Vite build output goes to /dist
+    const indexPath = path.join(app.getAppPath(), "dist", "index.html");
+    mainWindow.loadFile(indexPath);
   }
 
-  mainWin.once("ready-to-show", () => {
-    mainWin?.show();
-    if (splashWin) {
-      splashWin.close();
-      splashWin = null;
-    }
+  mainWindow.once("ready-to-show", () => {
+    // Give splash some time for a premium feel, then show main.
+    setTimeout(() => {
+      if (splashWindow && !splashWindow.isDestroyed()) splashWindow.close();
+      splashWindow = null;
+      mainWindow.show();
+    }, 900);
+  });
+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: "deny" };
   });
 }
 
-app.on("ready", async () => {
-  await createSplash();
-  // Simulate loading for 1200ms then open main window
-  setTimeout(async () => {
-    await createMainWindow();
-  }, 1200);
+app.whenReady().then(() => {
+  createSplash();
+  createMainWindow();
+
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createSplash();
+      createMainWindow();
+    }
+  });
 });
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
 
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
-});
-
-// Example IPC if you need it later
-ipcMain.handle("app:getVersion", () => app.getVersion());
-
-
+// Simple ping for preload health-check
+ipcMain.handle("app:ping", () => "pong");
 
 
 
