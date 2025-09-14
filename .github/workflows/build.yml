@@ -1,9 +1,9 @@
-name: Build & Publish Installers
+name: Build & Release
 
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
 
 jobs:
   build:
@@ -13,43 +13,38 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies (Linux only)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y icnsutils graphicsmagick imagemagick
-
-      - name: Install dependencies (macOS only)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install imagemagick graphicsmagick icoutils
-
-      - name: Ensure assets folder exists
-        run: |
-          mkdir -p apps/web/assets
-          mkdir -p apps/web/build/icons
-          echo "Ensured assets and icons folders exist."
-
-      - name: Install npm dependencies
-        working-directory: apps/web
+      - name: Install dependencies
         run: npm install
+        working-directory: apps/web
 
-      - name: Build Electron App
+      - name: Ensure assets and icons exist
+        run: |
+          mkdir -p apps/web/build/icons
+          cp -f apps/web/build/appicon2.png apps/web/build/icons/appicon.png || true
+        shell: bash
+
+      # Linux/macOS only: install tools needed for icons
+      - name: Install image tools
+        if: runner.os != 'Windows'
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y imagemagick graphicsmagick icoutils
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install imagemagick graphicsmagick icoutils || true
+          fi
+
+      - name: Build & Publish
+        run: npx electron-builder --publish always
         working-directory: apps/web
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npm run build
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: CraftedJewelz-${{ matrix.os }}
-          path: apps/web/dist/**
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
