@@ -1,45 +1,56 @@
 {
   "name": "craftedjewelz",
   "version": "3.0.2",
-  "description": "CraftedJewelz Desktop App",
-  "author": {
-    "name": "supersonicbranded",
-    "email": "support@craftedjewelz.com"
-  },
+  "description": "CraftedJewelz – Professional Jewelry Design & CAD Platform",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dev": "electron .",
     "build": "electron-builder"
   },
+  "author": {
+    "name": "Supersonic Branded",
+    "email": "support@craftedjewelz.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0"
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
+  },
   "build": {
-    "appId": "com.supersonicbranded.craftedjewelz",
+    "appId": "com.craftedjewelz.desktop",
     "productName": "CraftedJewelz",
-    "directories": {
-      "buildResources": "build",
-      "output": "dist"
-    },
     "files": [
+      "dist/**/*",
       "main.js",
       "preload.js",
       "index.html",
-      "package.json"
+      "assets/**/*",
+      "build/**/*"
     ],
-    "extraResources": [
-      "assets/**"
-    ],
+    "directories": {
+      "buildResources": "build"
+    },
     "mac": {
-      "target": ["dmg", "zip"],
-      "icon": "build/icons/icon.icns"
+      "category": "public.app-category.graphics-design",
+      "icon": "build/appicon2.icns",
+      "target": ["dmg", "zip"]
     },
     "win": {
-      "target": ["nsis", "zip"],
-      "icon": "build/icons/icon.ico"
+      "icon": "build/appicon2.ico",
+      "target": ["nsis", "zip"]
     },
     "linux": {
-      "target": ["AppImage", "deb"],
-      "maintainer": "supersonicbranded <support@craftedjewelz.com>",
-      "icon": "build/icons",
-      "category": "Utility"
+      "category": "Utility",
+      "icon": "build/appicon2.png",
+      "target": ["AppImage", "deb"]
     },
     "publish": [
       {
@@ -48,15 +59,5 @@
         "repo": "craftedjewelz-omega"
       }
     ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "electron": "^30.5.1",
-    "electron-builder": "^24.13.3"
-  },
-  "dependencies": {}
+  }
 }
