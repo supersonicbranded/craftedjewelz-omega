@@ -4,7 +4,7 @@
   "main": "main.js",
   "author": {
     "name": "Your Name",
-    "email": "your@email.com"
+    "email": "you@example.com"
   },
   "scripts": {
     "start": "electron .",
@@ -48,6 +48,11 @@
   "devDependencies": {
     "electron": "^30.5.1",
     "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "4.3.4",
+    "vite": "5.4.8",
+    "electron-store": "9.0.0"
   }
 }
 
