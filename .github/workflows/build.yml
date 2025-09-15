@@ -1,24 +1,23 @@
-name: Build Check
+name: Build CraftedJewelz
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
+    tags:
+      - "v*.*.*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: "npm"
           cache-dependency-path: apps/web/package-lock.json
 
       - name: Install dependencies
@@ -26,7 +25,13 @@ jobs:
           cd apps/web
           npm install --legacy-peer-deps
 
-      - name: Build project
+      - name: Build app
         run: |
           cd apps/web
           npm run build
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: craftedjewelz-build
+          path: apps/web/dist/**
