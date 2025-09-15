@@ -1,96 +1,75 @@
 {
   "name": "craftedjewelz",
   "version": "4.0.0",
-  "lockfileVersion": 3,
-  "requires": true,
-  "packages": {
-    "": {
-      "name": "craftedjewelz",
-      "version": "4.0.0",
-      "license": "MIT",
-      "dependencies": {
-        "electron-store": "9.0.0",
-        "react": "18.3.1",
-        "react-dom": "18.3.1"
-      },
-      "devDependencies": {
-        "@vitejs/plugin-react": "4.3.4",
-        "electron": "30.5.1",
-        "electron-builder": "24.13.3",
-        "tailwindcss": "3.4.13",
-        "postcss": "8.5.6",
-        "autoprefixer": "10.4.20",
-        "vite": "5.4.8"
+  "description": "CraftedJewelz desktop app with Electron, React (Vite), and TailwindCSS",
+  "main": "main.js",
+  "author": {
+    "name": "Supersonic Branded",
+    "email": "support@craftedjewelz.com"
+  },
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "electron-builder",
+    "start": "electron .",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "electron-store": "9.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "4.3.4",
+    "autoprefixer": "10.4.20",
+    "electron": "30.5.1",
+    "electron-builder": "24.13.3",
+    "postcss": "8.5.6",
+    "tailwindcss": "3.4.13",
+    "vite": "5.4.8"
+  },
+  "build": {
+    "appId": "com.supersonicbranded.craftedjewelz",
+    "productName": "CraftedJewelz",
+    "files": [
+      "dist/",
+      "main.js",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "apps/web/build/appicon2.icns",
+      "artifactName": "CraftedJewelz-${version}.dmg"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "apps/web/build/appicon2.ico",
+      "artifactName": "CraftedJewelz-${version}-setup.exe"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "apps/web/build/icons",
+      "category": "Utility",
+      "artifactName": "CraftedJewelz-${version}.${ext}"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "supersonicbranded",
+        "repo": "craftedjewelz-omega"
       }
-    },
-    "node_modules/react": {
-      "version": "18.3.1",
-      "resolved": "https://registry.npmjs.org/react/-/react-18.3.1.tgz",
-      "integrity": "sha512-vvHdElpFq8...",
-      "dependencies": {
-        "loose-envify": "^1.4.0"
-      }
-    },
-    "node_modules/react-dom": {
-      "version": "18.3.1",
-      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz",
-      "integrity": "sha512-WIojB0...",
-      "peerDependencies": {
-        "react": "^18.3.1"
-      }
-    },
-    "node_modules/electron": {
-      "version": "30.5.1",
-      "resolved": "https://registry.npmjs.org/electron/-/electron-30.5.1.tgz",
-      "integrity": "sha512-x4PJk...",
-      "dev": true
-    },
-    "node_modules/electron-builder": {
-      "version": "24.13.3",
-      "resolved": "https://registry.npmjs.org/electron-builder/-/electron-builder-24.13.3.tgz",
-      "integrity": "sha512-RQj0m...",
-      "dev": true
-    },
-    "node_modules/electron-store": {
-      "version": "9.0.0",
-      "resolved": "https://registry.npmjs.org/electron-store/-/electron-store-9.0.0.tgz",
-      "integrity": "sha512-MjHSy...",
-      "engines": {
-        "node": ">=16"
-      }
-    },
-    "node_modules/vite": {
-      "version": "5.4.8",
-      "resolved": "https://registry.npmjs.org/vite/-/vite-5.4.8.tgz",
-      "integrity": "sha512-xWv9...",
-      "dev": true
-    },
-    "node_modules/@vitejs/plugin-react": {
-      "version": "4.3.4",
-      "resolved": "https://registry.npmjs.org/@vitejs/plugin-react/-/plugin-react-4.3.4.tgz",
-      "integrity": "sha512-...",
-      "dev": true
-    },
-    "node_modules/tailwindcss": {
-      "version": "3.4.13",
-      "resolved": "https://registry.npmjs.org/tailwindcss/-/tailwindcss-3.4.13.tgz",
-      "integrity": "sha512-...",
-      "dev": true
-    },
-    "node_modules/postcss": {
-      "version": "8.5.6",
-      "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.6.tgz",
-      "integrity": "sha512-...",
-      "dev": true
-    },
-    "node_modules/autoprefixer": {
-      "version": "10.4.20",
-      "resolved": "https://registry.npmjs.org/autoprefixer/-/autoprefixer-10.4.20.tgz",
-      "integrity": "sha512-...",
-      "dev": true
-    }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   }
 }
 
 
-}
