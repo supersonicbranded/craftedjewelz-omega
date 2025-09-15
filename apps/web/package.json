@@ -1,101 +1,54 @@
 {
   "name": "craftedjewelz",
   "version": "4.0.0",
-  "description": "CraftedJewelz — Desktop app with polished splash and welcome dashboard.",
-  "private": true,
+  "main": "main.js",
   "author": {
-    "name": "CraftedJewelz",
-    "email": "support@craftedjewelz.app"
+    "name": "Your Name",
+    "email": "your@email.com"
   },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/supersonicbranded/craftedjewelz-omega"
-  },
-  "main": "electron/main.js",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build:renderer": "vite build",
-    "build": "npm run build:renderer && electron-builder",
     "start": "electron .",
-    "postinstall": "electron-builder install-app-deps"
-  },
-  "dependencies": {
-    "electron-store": "9.0.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "4.3.4",
-    "electron": "30.5.1",
-    "electron-builder": "24.13.3",
-    "vite": "5.4.8"
+    "build": "electron-builder"
   },
   "build": {
     "appId": "com.craftedjewelz.app",
     "productName": "CraftedJewelz",
-    "directories": {
-      "buildResources": "build",
-      "output": "dist"
-    },
     "files": [
-      "dist/**",
-      "electron/**",
-      "splash.html",
-      "assets/**",
-      "build/**",
+      "dist/**/*",
+      "main.js",
       "package.json"
     ],
-    "extraResources": [
-      "splash.html",
-      "assets/**"
-    ],
-    "asar": true,
-    "publish": "never",
+    "directories": {
+      "buildResources": "build"
+    },
     "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": ["x64", "arm64"]
-        }
-      ],
+      "target": "dmg",
       "category": "public.app-category.graphics-design",
-      "icon": "build/appicon2.png",
-      "hardenedRuntime": false
+      "dmg": {
+        "background": "build/dmg-background.png",
+        "iconSize": 128,
+        "iconTextSize": 12
+      }
     },
     "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": ["x64"]
-        }
-      ],
-      "icon": "build/appicon2.png"
+      "target": "nsis",
+      "icon": "build/appicon.ico"
     },
     "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ],
-      "category": "Graphics",
-      "icon": "build/appicon2.png",
-      "maintainer": "CraftedJewelz <support@craftedjewelz.app>"
+      "target": ["AppImage", "deb"],
+      "icon": "build/appicon.png",
+      "category": "Utility"
     },
-    "nsis": {
-      "oneClick": true,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": false,
-      "artifactName": "${productName}-${version}-Setup.${ext}"
-    },
-    "dmg": {
-      "artifactName": "${productName}-${version}.${ext}"
-    },
-    "appImage": {
-      "artifactName": "${productName}-${version}.${ext}"
-    },
-    "deb": {
-      "artifactName": "craftedjewelz_${version}_amd64.${ext}"
-    }
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ]
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
   }
+}
+
 }
