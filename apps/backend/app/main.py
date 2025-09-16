@@ -1,1 +1,7 @@
-from fastapi import FastAPI, Request\napp=FastAPI()\n@app.get('/')\ndef root(): return {'ok':True}\n
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+@app.get('/')
+def root():
+    return {'ok': True}
