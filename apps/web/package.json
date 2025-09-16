@@ -1,6 +1,7 @@
 {
   "name": "craftedjewelz",
   "version": "4.0.0",
+  "type": "module",
   "description": "CraftedJewelz desktop app with Electron, React (Vite), and TailwindCSS",
   "main": "main.js",
   "author": {
@@ -12,12 +13,13 @@
     "dev": "vite",
     "build": "electron-builder",
     "start": "electron .",
-    "postinstall": "electron-builder install-app-deps"
+    "build:vite": "vite build"
   },
   "dependencies": {
     "electron-store": "9.0.0",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "scheduler": "^0.26.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "4.3.4",
@@ -71,5 +73,3 @@
     "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
   }
 }
-
-
