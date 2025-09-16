@@ -1,1 +1,4 @@
-fastapi\nuvicorn\nreportlab\nrequests
+fastapi
+uvicorn
+reportlab
+requests
