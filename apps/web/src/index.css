@@ -3,7 +3,40 @@
 @tailwind utilities;
 
 /* Custom global styles */
+
 body {
   @apply bg-neutral-900 text-gray-200;
+  --cj-bg: #181818;
+  --cj-text: #e5e5e5;
+  --cj-accent: #FFD700;
+}
+
+body[data-theme="light"] {
+  --cj-bg: #f8f8f8;
+  --cj-text: #222;
+  --cj-accent: #FFD700;
+  background: #f8f8f8;
+  color: #222;
+}
+
+body[data-theme="dark"] {
+  --cj-bg: #181818;
+  --cj-text: #e5e5e5;
+  --cj-accent: #FFD700;
+  background: #181818;
+  color: #e5e5e5;
+}
+
+body[data-theme="gold"] {
+  --cj-bg: #181818;
+  --cj-text: #FFD700;
+  --cj-accent: #FFD700;
+  background: linear-gradient(135deg, #181818 60%, #FFD700 100%);
+  color: #FFD700;
+}
+
+.matrixgold-theme, .cj-theme {
+  background: var(--cj-bg);
+  color: var(--cj-text);
 }
 

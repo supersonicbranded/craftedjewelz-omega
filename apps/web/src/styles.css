@@ -8,7 +8,7 @@
   --green: #19b97c;
   --gold: #d4af37;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-}
+/* ...existing code... */
 
 * { box-sizing: border-box; }
 
@@ -78,6 +78,27 @@ html, body, #root {
 }
 .logo-row {
   display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center;
+}
+.nav-item:focus, .btn:focus, .template-card:focus {
+  outline: 2px solid var(--accent-a);
+  outline-offset: 2px;
+  background: #23232b;
+}
+.toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: #23232b;
+  color: #fff;
+  padding: 14px 24px;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  font-size: 16px;
+  z-index: 1000;
+  animation: fadein 0.3s, fadeout 0.3s 2.2s;
+}
+@keyframes fadein { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+@keyframes fadeout { from { opacity: 1; } to { opacity: 0; } }
 }
 .badge {
   width: 40px; height: 40px; position: relative; border-radius: 10px;

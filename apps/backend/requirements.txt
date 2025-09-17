@@ -2,3 +2,8 @@ fastapi
 uvicorn
 reportlab
 requests
+sqlalchemy
+asyncpg
+passlib[bcrypt]
+python-jose
+squareup

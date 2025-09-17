@@ -1,5 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
+import GeometryViewport3D from "./GeometryViewport3D";
+import CollaborationPanel from "./CollaborationPanel";
+import PluginMarketplacePanel from "./PluginMarketplacePanel";
+import ScriptingPanel from "./ScriptingPanel";
+import AIAssistedDesignPanel from "./AIAssistedDesignPanel";
+import PerformancePanel from "./PerformancePanel";
 
 const recentFiles = [
   { name: "DiamondRingDesign.cjz", date: "Today" },
@@ -8,6 +14,9 @@ const recentFiles = [
 ];
 
 export default function WelcomeScreen() {
+  const [show3D, setShow3D] = React.useState(false);
+  const [geometry, setGeometry] = React.useState<any>({ type: "sphere", radius: 30 });
+
   return (
     <div className="min-h-screen bg-neutral-900 text-gray-200 flex flex-col">
       {/* Header */}
@@ -61,6 +70,27 @@ export default function WelcomeScreen() {
               </motion.li>
             ))}
           </ul>
+          <button className="btn mt-8" onClick={() => setShow3D(true)}>
+            Open 3D Preview
+          </button>
+          {show3D && (
+            <GeometryViewport3D geometry={geometry} onClose={() => setShow3D(false)} />
+          )}
+          <div className="mt-8">
+            <CollaborationPanel />
+          </div>
+          <div className="mt-8">
+            <PluginMarketplacePanel />
+          </div>
+          <div className="mt-8">
+            <ScriptingPanel />
+          </div>
+          <div className="mt-8">
+            <AIAssistedDesignPanel />
+          </div>
+          <div className="mt-8">
+            <PerformancePanel />
+          </div>
         </main>
       </div>
     </div>

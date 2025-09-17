@@ -72,6 +72,17 @@ app.whenReady().then(() => {
   createSplash();
   createMainWindow();
 
+  // Auto-update event handlers
+  autoUpdater.on("update-available", () => {
+    if (mainWindow) mainWindow.webContents.send("update_available");
+  });
+  autoUpdater.on("update-downloaded", () => {
+    if (mainWindow) mainWindow.webContents.send("update_downloaded");
+  });
+  autoUpdater.on("error", (err) => {
+    if (mainWindow) mainWindow.webContents.send("update_error", err == null ? "Unknown error" : err.message);
+  });
+
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createSplash();
