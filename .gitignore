@@ -1,1 +1,5 @@
 node_modules
+apps/web/dist/*.deb
+apps/web/dist/*.AppImage
+apps/web/dist/linux-unpacked/
+apps/web/node_modules/electron/dist/electron
