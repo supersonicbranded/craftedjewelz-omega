@@ -1,3 +1,23 @@
+from fastapi.responses import JSONResponse
+import random
+# --- Diamond Price API ---
+@app.get("/market/diamond-prices")
+async def get_diamond_prices():
+    # TODO: Integrate with RapNet, IDEX, or other real diamond price API
+    # For now, return stubbed prices for popular shapes
+    prices = {
+        "Round": f"{random.randint(3500, 6500)} USD",
+        "Princess": f"{random.randint(3200, 6000)} USD",
+        "Emerald": f"{random.randint(3000, 5800)} USD",
+        "Oval": f"{random.randint(3400, 6200)} USD",
+        "Cushion": f"{random.randint(3300, 6100)} USD",
+        "Radiant": f"{random.randint(3100, 5900)} USD",
+        "Pear": f"{random.randint(3200, 6000)} USD",
+        "Asscher": f"{random.randint(3000, 5700)} USD",
+        "Marquise": f"{random.randint(3100, 5800)} USD",
+        "Heart": f"{random.randint(3500, 6500)} USD"
+    }
+    return JSONResponse(content={"prices": prices})
 from fastapi import FastAPI, Depends, HTTPException, status, Request, WebSocket, WebSocketDisconnect, UploadFile, File, APIRouter
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -31,195 +51,170 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = "your-secret-key"
-ALGORITHM = "HS256"
 
-app = FastAPI()
-
-# --- Cloud Project File Download, Versioning, Sharing ---
-class CloudProjectDownloadRequest(BaseModel):
-    project_id: int
-    version: Optional[str] = None
-
-class CloudProjectDownloadOut(BaseModel):
-    download_url: str
+class PaymentStatus(BaseModel):
+    payment_id: str
     status: str
-    error: Optional[str] = None
+    method: str
+    amount: float
+    currency: str
+    created_at: datetime
 
-class CloudProjectShareRequest(BaseModel):
-    project_id: int
-    user_email: str
+payment_status_db = []  # Replace with real DB in production
 
-class CloudProjectShareOut(BaseModel):
-    share_id: str
-    status: str
-    error: Optional[str] = None
+# --- Stripe Payment Endpoint ---
+class StripePaymentRequest(BaseModel):
+    amount: int
+    currency: str = "usd"
+    source: str
+    description: Optional[str] = None
 
-# --- Cloud Rendering Job Status & Asset Upload ---
-class CloudRenderJobStatusOut(BaseModel):
-    job_id: str
-    status: str
-    preview_url: Optional[str] = None
+@app.post("/payments/stripe")
+async def create_stripe_payment(data: StripePaymentRequest):
+    try:
+        charge = stripe.Charge.create(
+            amount=data.amount,
+            currency=data.currency,
+            source=data.source,
+            description=data.description
+        )
+        payment_status_db.append(PaymentStatus(
+            payment_id=charge.id,
+            status=charge.status,
+            method="stripe",
+            amount=data.amount / 100,
+            currency=data.currency,
+            created_at=datetime.utcfromtimestamp(charge.created)
+        ))
+        return {"ok": True, "charge": charge}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-class CloudRenderAssetUploadRequest(BaseModel):
-    job_id: str
-    asset_url: str
-    asset_type: str
+# --- PayPal Payment Endpoint ---
+class PayPalPaymentRequest(BaseModel):
+    amount: str
+    currency: str = "USD"
+    description: Optional[str] = None
 
-class CloudRenderAssetUploadOut(BaseModel):
-    upload_id: str
-    status: str
-    asset_url: str
-    error: Optional[str] = None
-from fastapi import FastAPI, Depends, HTTPException, status, Request, WebSocket, WebSocketDisconnect, UploadFile, File, APIRouter
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import Column, Integer, String, Float, Text
-from passlib.context import CryptContext
-from jose import JWTError, jwt
-from pydantic import BaseModel, EmailStr
-import os
-import stripe
-import paypalrestsdk
-from dotenv import load_dotenv
-import requests
-from datetime import datetime
-from typing import Optional, List
-import uuid
-from square.client import Client
-
-load_dotenv()
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "sk_test_...")
-paypalrestsdk.configure({
-    "mode": "sandbox",  # or "live"
-    "client_id": os.getenv("PAYPAL_CLIENT_ID", ""),
-    "client_secret": os.getenv("PAYPAL_CLIENT_SECRET", "")
-})
-SQUARE_ACCESS_TOKEN = os.getenv("SQUARE_ACCESS_TOKEN", "your-square-access-token")
-SQUARE_LOCATION_ID = os.getenv("SQUARE_LOCATION_ID", "your-location-id")
-square_client = Client(access_token=SQUARE_ACCESS_TOKEN, environment="sandbox")
-
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:password@localhost/postgres")
-engine = create_async_engine(DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-Base = declarative_base()
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = "your-secret-key"
-ALGORITHM = "HS256"
-
-app = FastAPI()
-
-# --- Cloud Project File Download, Versioning, Sharing ---
-class CloudProjectDownloadRequest(BaseModel):
-    project_id: int
-    version: Optional[str] = None
-
-class CloudProjectDownloadOut(BaseModel):
-    download_url: str
-    status: str
-    error: Optional[str] = None
-
-class CloudProjectShareRequest(BaseModel):
-    project_id: int
-    user_email: str
-
-class CloudProjectShareOut(BaseModel):
-    share_id: str
-    status: str
-    error: Optional[str] = None
-
-# --- Cloud Rendering Job Status & Asset Upload ---
-class CloudRenderJobStatusOut(BaseModel):
-    job_id: str
-    status: str
-    preview_url: Optional[str] = None
-
-class CloudRenderAssetUploadRequest(BaseModel):
-    job_id: str
-    asset_url: str
-    asset_type: str
-
-class CloudRenderAssetUploadOut(BaseModel):
-    upload_id: str
-    status: str
-    asset_url: str
-    error: Optional[str] = None
-
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException, status, Request, UploadFile, File, APIRouter
-...existing code...
-
-# Register cloud endpoints after app initialization
-app = FastAPI()
-
-@app.post("/cloud/project/download", response_model=CloudProjectDownloadOut)
-async def download_project_file(data: CloudProjectDownloadRequest):
-    provider = CloudProvider(CLOUD_PROVIDER)
-    if provider == CloudProvider.aws:
-        download_url = f"https://s3.amazonaws.com/yourbucket/projects/{data.project_id}/{data.version or 'latest'}.zip"
-    elif provider == CloudProvider.gcp:
-        download_url = f"https://storage.googleapis.com/yourbucket/projects/{data.project_id}/{data.version or 'latest'}.zip"
-    elif provider == CloudProvider.azure:
-        download_url = f"https://youraccount.blob.core.windows.net/projects/{data.project_id}/{data.version or 'latest'}.zip"
+@app.post("/payments/paypal")
+async def create_paypal_payment(data: PayPalPaymentRequest):
+    payment = paypalrestsdk.Payment({
+        "intent": "sale",
+        "payer": {"payment_method": "paypal"},
+        "transactions": [{
+            "amount": {"total": data.amount, "currency": data.currency},
+            "description": data.description or ""
+        }],
+        "redirect_urls": {
+            "return_url": "https://example.com/payment/execute",
+            "cancel_url": "https://example.com/payment/cancel"
+        }
+    })
+    if payment.create():
+        payment_status_db.append(PaymentStatus(
+            payment_id=payment.id,
+            status=payment.state,
+            method="paypal",
+            amount=float(data.amount),
+            currency=data.currency,
+            created_at=datetime.utcnow()
+        ))
+        return {"ok": True, "payment": payment.to_dict()}
     else:
-        download_url = f"/static/projects/{data.project_id}_{data.version or 'latest'}.zip"
-    return CloudProjectDownloadOut(download_url=download_url, status="ready")
+        raise HTTPException(status_code=400, detail=payment.error)
 
-@app.post("/cloud/project/share", response_model=CloudProjectShareOut)
-async def share_project_file(data: CloudProjectShareRequest):
-    share_id = str(uuid.uuid4())
-    status = "shared"
-    return CloudProjectShareOut(share_id=share_id, status=status)
+# --- Refund Endpoints ---
+class RefundRequest(BaseModel):
+    payment_id: str
+    amount: Optional[int] = None
 
-@app.get("/cloud/render/status/{job_id}", response_model=CloudRenderJobStatusOut)
-async def get_cloud_render_job_status(job_id: str):
-    if job_id.startswith("aws-"):
-        status = "completed"
-        preview_url = f"https://s3.amazonaws.com/yourbucket/renders/{job_id}_preview.png"
-    elif job_id.startswith("gcp-"):
-        status = "completed"
-        preview_url = f"https://storage.googleapis.com/yourbucket/renders/{job_id}_preview.png"
-    elif job_id.startswith("azure-"):
-        status = "completed"
-        preview_url = f"https://youraccount.blob.core.windows.net/renders/{job_id}_preview.png"
-    elif job_id.startswith("local-"):
-        status = "completed"
-        preview_url = f"/static/renders/{job_id}_preview.png"
+@app.post("/payments/refund/stripe")
+async def refund_stripe_payment(data: RefundRequest):
+    try:
+        refund = stripe.Refund.create(
+            charge=data.payment_id,
+            amount=data.amount
+        )
+        return {"ok": True, "refund": refund}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+# Refund endpoint (PayPal)
+@app.post("/payments/refund/paypal")
+async def refund_paypal_payment(data: RefundRequest):
+    sale = paypalrestsdk.Sale.find(data.payment_id)
+    refund = sale.refund({"amount": {"total": str(data.amount), "currency": "USD"}})
+    if refund.success():
+        return {"ok": True, "refund": refund.to_dict()}
     else:
-        status = "unknown"
-        preview_url = None
-    return CloudRenderJobStatusOut(job_id=job_id, status=status, preview_url=preview_url)
+        raise HTTPException(status_code=400, detail=refund.error)
 
-@app.post("/cloud/render/upload", response_model=CloudRenderAssetUploadOut)
-async def upload_cloud_render_asset(data: CloudRenderAssetUploadRequest):
-    upload_id = str(uuid.uuid4())
-    status = "uploaded"
-    return CloudRenderAssetUploadOut(upload_id=upload_id, status=status, asset_url=data.asset_url)
-# --- Cloud Provider Config ---
-class CloudProvider(str, Enum):
-    aws = "aws"
-    gcp = "gcp"
-    azure = "azure"
-    local = "local"
+# --- Subscription Endpoint (Stripe) ---
+class SubscriptionRequest(BaseModel):
+    customer_id: str
+    price_id: str
 
-CLOUD_PROVIDER = os.getenv("CLOUD_PROVIDER", "local")  # Change to aws/gcp/azure as needed
+@app.post("/payments/subscribe/stripe")
+async def create_stripe_subscription(data: SubscriptionRequest):
+    try:
+        subscription = stripe.Subscription.create(
+            customer=data.customer_id,
+            items=[{"price": data.price_id}]
+        )
+        return {"ok": True, "subscription": subscription}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-def submit_render_job_to_provider(provider: CloudProvider, model_id: int, quality: str, options: dict):
-    # Stub: Add real integration for each provider
-    if provider == CloudProvider.aws:
-        # AWS Batch, Lambda, S3, etc.
-        job_id = f"aws-{uuid.uuid4()}"
-        preview_url = f"https://s3.amazonaws.com/yourbucket/renders/{model_id}_preview.png"
-        status = "queued"
-    elif provider == CloudProvider.gcp:
-        # GCP Cloud Functions, Storage, etc.
-        job_id = f"gcp-{uuid.uuid4()}"
-        preview_url = f"https://storage.googleapis.com/yourbucket/renders/{model_id}_preview.png"
-        status = "queued"
-    elif provider == CloudProvider.azure:
-        # Azure Functions, Blob Storage, etc.
-        job_id = f"azure-{uuid.uuid4()}"
+# --- Stripe Webhook Endpoint ---
+@app.post("/payments/webhook/stripe")
+async def stripe_webhook(request: Request):
+    payload = await request.body()
+    sig_header = request.headers.get("Stripe-Signature")
+    endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET", "whsec_...")
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+        # Handle event types here
+        return {"ok": True, "event": event}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+# --- Multi-currency Support (Stripe) ---
+@app.get("/payments/currencies")
+async def get_supported_currencies():
+    try:
+        currencies = stripe.CountrySpec.list()
+        return {"ok": True, "currencies": currencies}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+# --- Invoice Generation (Stripe) ---
+class InvoiceRequest(BaseModel):
+    customer_id: str
+    amount: int
+    currency: str = "usd"
+    email: EmailStr
+
+@app.post("/payments/invoice/stripe")
+async def create_stripe_invoice(data: InvoiceRequest):
+    try:
+        invoice_item = stripe.InvoiceItem.create(
+            customer=data.customer_id,
+            amount=data.amount,
+            currency=data.currency,
+            description="Custom invoice"
+        )
+        invoice = stripe.Invoice.create(
+            customer=data.customer_id,
+            auto_advance=True
+        )
+        stripe.Invoice.send_invoice(invoice.id)
+        # Email sending logic here (use SendGrid, SMTP, etc.)
+        return {"ok": True, "invoice": invoice}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
         preview_url = f"https://youraccount.blob.core.windows.net/renders/{model_id}_preview.png"
         status = "queued"
     else:
@@ -1436,8 +1431,12 @@ SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
 ALGORITHM = "HS256"
 
 
+<<<<<<< HEAD
 # --- Models ---
 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
+=======
+ # --- Models ---
+>>>>>>> 0689d48 (Force commit all staged changes)
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
@@ -1458,8 +1457,7 @@ class Project(Base):
     title = Column(String, index=True)
     details = Column(Text)
 
-<<<<<<< HEAD
-=======
+ 
 # Advanced CAD Models
 class CADModel(Base):
     __tablename__ = "cad_models"
@@ -1660,8 +1658,7 @@ async def cloud_render(model_id: int):
 async def collaborate(model_id: int, user: str):
     return {"ok": True, "status": "invited", "user": user}
 
-# --- Schemas ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
+ # --- Schemas ---
 class UserCreate(BaseModel):
     username: str
     email: str
@@ -1674,13 +1671,13 @@ class UserOut(BaseModel):
     class Config:
         orm_mode = True
 
-<<<<<<< HEAD
-=======
+ 
+ 
 class Token(BaseModel):
     access_token: str
     token_type: str
 
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
+
 class ProductCreate(BaseModel):
     name: str
     description: str
@@ -1705,7 +1702,7 @@ class ProjectOut(BaseModel):
     class Config:
         orm_mode = True
 
-<<<<<<< HEAD
+ 
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -1715,14 +1712,6 @@ async def startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-def create_access_token(data: dict):
-=======
 
 # --- Utility Functions ---
 def get_password_hash(password: str) -> str:
@@ -1734,22 +1723,16 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 def create_access_token(data: dict) -> str:
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
 
 async def get_db():
     async with SessionLocal() as session:
         yield session
 
-<<<<<<< HEAD
+ 
 # User Endpoints
 @app.post("/register", response_model=UserOut)
-async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
-    db_user = await db.execute(
-        User.__table__.select().where(User.username == user.username)
-    )
-    if db_user.scalar():
-=======
+ 
 # --- Startup Event ---
 @app.on_event("startup")
 async def startup():
@@ -1770,14 +1753,13 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     db_user = result.scalars().first()
     if db_user:
         logger.warning(f"Username already registered: {user.username}")
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
         raise HTTPException(status_code=400, detail="Username already registered")
     hashed_password = get_password_hash(user.password)
     new_user = User(username=user.username, email=user.email, hashed_password=hashed_password)
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
-<<<<<<< HEAD
+ 
     return new_user
 
 @app.post("/login", response_model=Token)
@@ -1794,7 +1776,7 @@ async def login(form_data: UserCreate, db: AsyncSession = Depends(get_db)):
 # Product CRUD Endpoints
 @app.post("/products", response_model=ProductOut)
 async def create_product(product: ProductCreate, db: AsyncSession = Depends(get_db)):
-=======
+ 
     logger.info(f"User registered: {new_user.username}")
     return new_user
 
@@ -1819,53 +1801,37 @@ async def create_product(product: ProductCreate, db: AsyncSession = Depends(get_
     """
     Create a new product in the database.
     """
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     new_product = Product(**product.dict())
     db.add(new_product)
     await db.commit()
     await db.refresh(new_product)
     return new_product
 
-<<<<<<< HEAD
-@app.get("/products", response_model=List[ProductOut])
-async def list_products(db: AsyncSession = Depends(get_db)):
-=======
 @app.get("/products", response_model=List[ProductOut], summary="List products", response_description="List of products")
 async def list_products(db: AsyncSession = Depends(get_db)):
     """
     Retrieve all products from the database.
     """
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     result = await db.execute(Product.__table__.select())
     products = result.scalars().all()
     return products
 
-<<<<<<< HEAD
-@app.get("/products/{product_id}", response_model=ProductOut)
-async def get_product(product_id: int, db: AsyncSession = Depends(get_db)):
-=======
 @app.get("/products/{product_id}", response_model=ProductOut, summary="Get product by ID", response_description="Product details")
 async def get_product(product_id: int, db: AsyncSession = Depends(get_db)):
     """
     Retrieve a product by its ID.
     """
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     result = await db.execute(Product.__table__.select().where(Product.id == product_id))
     product = result.scalar()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
-<<<<<<< HEAD
-@app.put("/products/{product_id}", response_model=ProductOut)
-async def update_product(product_id: int, product: ProductCreate, db: AsyncSession = Depends(get_db)):
-=======
 @app.put("/products/{product_id}", response_model=ProductOut, summary="Update product", response_description="Updated product")
 async def update_product(product_id: int, product: ProductCreate, db: AsyncSession = Depends(get_db)):
     """
     Update an existing product by ID.
     """
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     result = await db.execute(Product.__table__.select().where(Product.id == product_id))
     db_product = result.scalar()
     if not db_product:
@@ -1877,16 +1843,11 @@ async def update_product(product_id: int, product: ProductCreate, db: AsyncSessi
     await db.refresh(db_product)
     return db_product
 
-<<<<<<< HEAD
-@app.delete("/products/{product_id}")
-async def delete_product(product_id: int, db: AsyncSession = Depends(get_db)):
-=======
 @app.delete("/products/{product_id}", summary="Delete product", response_description="Delete confirmation")
 async def delete_product(product_id: int, db: AsyncSession = Depends(get_db)):
     """
     Delete a product by its ID.
     """
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     result = await db.execute(Product.__table__.select().where(Product.id == product_id))
     db_product = result.scalar()
     if not db_product:
@@ -1895,64 +1856,43 @@ async def delete_product(product_id: int, db: AsyncSession = Depends(get_db)):
     await db.commit()
     return {"detail": "Product deleted"}
 
-<<<<<<< HEAD
-# Project CRUD Endpoints
-@app.post("/projects", response_model=ProjectOut)
-async def create_project(project: ProjectCreate, db: AsyncSession = Depends(get_db)):
-=======
 # --- Project CRUD Endpoints ---
 @app.post("/projects", response_model=ProjectOut, summary="Create a project", response_description="The created project")
 async def create_project(project: ProjectCreate, db: AsyncSession = Depends(get_db)):
     """
     Create a new project in the database.
     """
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     new_project = Project(**project.dict())
     db.add(new_project)
     await db.commit()
     await db.refresh(new_project)
     return new_project
 
-<<<<<<< HEAD
-@app.get("/projects", response_model=List[ProjectOut])
-async def list_projects(db: AsyncSession = Depends(get_db)):
-=======
 @app.get("/projects", response_model=List[ProjectOut], summary="List projects", response_description="List of projects")
 async def list_projects(db: AsyncSession = Depends(get_db)):
     """
     Retrieve all projects from the database.
     """
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     result = await db.execute(Project.__table__.select())
     projects = result.scalars().all()
     return projects
 
-<<<<<<< HEAD
-@app.get("/projects/{project_id}", response_model=ProjectOut)
-async def get_project(project_id: int, db: AsyncSession = Depends(get_db)):
-=======
 @app.get("/projects/{project_id}", response_model=ProjectOut, summary="Get project by ID", response_description="Project details")
 async def get_project(project_id: int, db: AsyncSession = Depends(get_db)):
     """
     Retrieve a project by its ID.
     """
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     result = await db.execute(Project.__table__.select().where(Project.id == project_id))
     project = result.scalar()
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     return project
 
-<<<<<<< HEAD
-@app.put("/projects/{project_id}", response_model=ProjectOut)
-async def update_project(project_id: int, project: ProjectCreate, db: AsyncSession = Depends(get_db)):
-=======
 @app.put("/projects/{project_id}", response_model=ProjectOut, summary="Update project", response_description="Updated project")
 async def update_project(project_id: int, project: ProjectCreate, db: AsyncSession = Depends(get_db)):
     """
     Update an existing project by ID.
     """
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     result = await db.execute(Project.__table__.select().where(Project.id == project_id))
     db_project = result.scalar()
     if not db_project:
@@ -1964,16 +1904,11 @@ async def update_project(project_id: int, project: ProjectCreate, db: AsyncSessi
     await db.refresh(db_project)
     return db_project
 
-<<<<<<< HEAD
-@app.delete("/projects/{project_id}")
-async def delete_project(project_id: int, db: AsyncSession = Depends(get_db)):
-=======
 @app.delete("/projects/{project_id}", summary="Delete project", response_description="Delete confirmation")
 async def delete_project(project_id: int, db: AsyncSession = Depends(get_db)):
     """
     Delete a project by its ID.
     """
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
     result = await db.execute(Project.__table__.select().where(Project.id == project_id))
     db_project = result.scalar()
     if not db_project:
@@ -1982,11 +1917,7 @@ async def delete_project(project_id: int, db: AsyncSession = Depends(get_db)):
     await db.commit()
     return {"detail": "Project deleted"}
 
-<<<<<<< HEAD
-# Marketplace APIs
-=======
 # --- Marketplace APIs ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 @app.get("/marketplace/products", response_model=List[ProductOut])
 async def marketplace_products(db: AsyncSession = Depends(get_db)):
     result = await db.execute(Product.__table__.select())
@@ -1999,9 +1930,6 @@ async def marketplace_projects(db: AsyncSession = Depends(get_db)):
     projects = result.scalars().all()
     return projects
 
-<<<<<<< HEAD
-# Square Payment Endpoint
-=======
 # --- Payment Status Tracking ---
 class PaymentStatus(BaseModel):
     payment_id: str
@@ -2012,9 +1940,6 @@ class PaymentStatus(BaseModel):
     created_at: datetime
 
 payment_status_db = []  # Replace with real DB in production
-
-# --- Square Payment Endpoint ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 @app.post("/payments/square")
 async def create_square_payment(amount: float):
     idempotency_key = str(uuid.uuid4())
@@ -2033,22 +1958,9 @@ async def create_square_payment(amount: float):
     else:
         raise HTTPException(status_code=400, detail=str(result.errors))
 
-<<<<<<< HEAD
-# Payment status tracking
-class PaymentStatus(BaseModel):
-    payment_id: str
-    status: str
-    method: str
-    amount: float
-    currency: str
-    created_at: datetime
-
 payment_status_db = []  # Replace with real DB in production
-
-# Stripe payment endpoint
-=======
+payment_status_db = []  # Replace with real DB in production
 # --- Stripe Payment Endpoint ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 class StripePaymentRequest(BaseModel):
     amount: int
     currency: str = "usd"
@@ -2076,11 +1988,7 @@ async def create_stripe_payment(data: StripePaymentRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-<<<<<<< HEAD
-# PayPal payment endpoint
-=======
 # --- PayPal Payment Endpoint ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 class PayPalPaymentRequest(BaseModel):
     amount: str
     currency: str = "USD"
@@ -2113,11 +2021,7 @@ async def create_paypal_payment(data: PayPalPaymentRequest):
     else:
         raise HTTPException(status_code=400, detail=payment.error)
 
-<<<<<<< HEAD
-# Refund endpoint (Stripe)
-=======
 # --- Refund Endpoints ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 class RefundRequest(BaseModel):
     payment_id: str
     amount: Optional[int] = None
@@ -2133,10 +2037,7 @@ async def refund_stripe_payment(data: RefundRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-<<<<<<< HEAD
 # Refund endpoint (PayPal)
-=======
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 @app.post("/payments/refund/paypal")
 async def refund_paypal_payment(data: RefundRequest):
     sale = paypalrestsdk.Sale.find(data.payment_id)
@@ -2146,11 +2047,7 @@ async def refund_paypal_payment(data: RefundRequest):
     else:
         raise HTTPException(status_code=400, detail=refund.error)
 
-<<<<<<< HEAD
-# Subscription endpoint (Stripe)
-=======
 # --- Subscription Endpoint (Stripe) ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 class SubscriptionRequest(BaseModel):
     customer_id: str
     price_id: str
@@ -2166,11 +2063,7 @@ async def create_stripe_subscription(data: SubscriptionRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-<<<<<<< HEAD
-# Webhook endpoint (Stripe)
-=======
 # --- Stripe Webhook Endpoint ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 @app.post("/payments/webhook/stripe")
 async def stripe_webhook(request: Request):
     payload = await request.body()
@@ -2185,11 +2078,7 @@ async def stripe_webhook(request: Request):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-<<<<<<< HEAD
-# Multi-currency support (Stripe)
-=======
 # --- Multi-currency Support (Stripe) ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 @app.get("/payments/currencies")
 async def get_supported_currencies():
     try:
@@ -2198,11 +2087,7 @@ async def get_supported_currencies():
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-<<<<<<< HEAD
-# Invoice generation (Stripe)
-=======
 # --- Invoice Generation (Stripe) ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 class InvoiceRequest(BaseModel):
     customer_id: str
     amount: int
@@ -2227,171 +2112,3 @@ async def create_stripe_invoice(data: InvoiceRequest):
         return {"ok": True, "invoice": invoice}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-<<<<<<< HEAD
-# Admin dashboard endpoints
-@app.get("/admin/payments")
-async def get_all_payments():
-    return {"ok": True, "payments": [p.dict() for p in payment_status_db]}
-
-@app.get("/admin/payments/analytics")
-async def get_payment_analytics():
-    total = sum(p.amount for p in payment_status_db)
-    count = len(payment_status_db)
-    by_method = {}
-    for p in payment_status_db:
-        by_method.setdefault(p.method, 0)
-        by_method[p.method] += p.amount
-    return {"ok": True, "total": total, "count": count, "by_method": by_method}
-
-@app.get("/")
-def root():
-    return {"ok": True}
-=======
-
-# ...existing code...
-
-# --- Plugin Marketplace Endpoints (demo, in-memory) ---
-plugin_list = [
-    {"name": "Parametric Modeling", "installed": True, "description": "Advanced parametric CAD tools."},
-    {"name": "Stone Pattern Generator", "installed": False, "description": "Automate stone layouts and patterns."},
-    {"name": "Technical Drawing Export", "installed": True, "description": "Export PDF/DXF drawings."},
-    {"name": "Cloud Rendering", "installed": False, "description": "Render designs in the cloud."}
-]
-
-collab_users = [
-    {"name": "You", "color": "#6366f1"},
-    {"name": "Alice", "color": "#f59e42"},
-    {"name": "Bob", "color": "#8fd3f4"}
-]
-collab_annotations = [
-    {"user": "Alice", "text": "Check prong thickness here.", "time": "2m ago"},
-    {"user": "Bob", "text": "Suggest larger stone size.", "time": "1m ago"}
-]
-
-script_list = [
-    {"name": "Batch Export Stones", "language": "Python", "code": "for stone in stones: export(stone)"},
-    {"name": "Auto Layout", "language": "JS", "code": "layoutStones(mesh, params)"}
-]
-
-ai_suggestions = [
-    {"type": "Auto Layout", "description": "Suggest optimal stone arrangement for current mesh."},
-    {"type": "Error Correction", "description": "Detect and fix overlapping stones."},
-    {"type": "Generative Design", "description": "Generate new ring design based on user preferences."}
-]
-
-# Ensure all endpoints are registered after app = FastAPI()
-
-app = FastAPI()
-
-@app.get("/plugins/list")
-async def get_plugins():
-    return {"plugins": plugin_list}
-
-@app.post("/plugins/install")
-async def install_plugin(req: Request):
-    data = await req.json()
-    for p in plugin_list:
-        if p["name"] == data.get("name"):
-            p["installed"] = True
-    return {"plugins": plugin_list}
-
-@app.post("/plugins/uninstall")
-async def uninstall_plugin(req: Request):
-    data = await req.json()
-    for p in plugin_list:
-        if p["name"] == data.get("name"):
-            p["installed"] = False
-    return {"plugins": plugin_list}
-
-@app.get("/collab/users")
-async def get_collab_users():
-    return {"users": collab_users}
-
-@app.get("/collab/annotations")
-async def get_collab_annotations():
-    return {"annotations": collab_annotations}
-
-@app.post("/collab/annotations")
-async def add_collab_annotation(req: Request):
-    data = await req.json()
-    collab_annotations.append({"user": data.get("user", "You"), "text": data.get("text", ""), "time": "now"})
-    return {"annotations": collab_annotations}
-
-@app.post("/collab/share")
-async def share_project():
-    # Demo: always succeeds
-    return {"status": "Project shared!"}
-
-@app.get("/scripts/list")
-async def get_scripts():
-    return {"scripts": script_list}
-
-@app.post("/scripts/run")
-async def run_script(req: Request):
-    data = await req.json()
-    # Simulate script execution
-    output = f"Script '{data.get('name')}' executed. Output: OK."
-    return {"output": output}
-
-@app.get("/ai/suggest")
-async def get_ai_suggestions():
-    return {"suggestions": ai_suggestions}
-
-@app.post("/ai/correct")
-async def apply_ai_correction(req: Request):
-    data = await req.json()
-    # Simulate AI suggestion application
-    output = f"AI suggestion '{data.get('type')}' applied. Result: Success."
-    return {"output": output}
-
-# --- Earring Studio Plugin Endpoint ---
-@app.post("/plugins/earring-studio")
-async def earring_studio_plugin(payload: dict):
-    """
-    Earring Studio plugin stub.
-    Accepts earring type (solitaire, hoop, bamboo, custom), template params, post/back options.
-    Returns stubbed earring geometry and preview URL.
-    """
-    # Example stub response
-    earring_type = payload.get("earring_type", "solitaire")
-    template = payload.get("template", "default")
-    post_type = payload.get("post_type", "regular")
-    backing_type = payload.get("backing_type", "regular")
-    geometry_stub = f"Earring geometry for type '{earring_type}', template '{template}', post '{post_type}', backing '{backing_type}' (stub)"
-    return {
-        "earring_type": earring_type,
-        "template": template,
-        "post_type": post_type,
-        "backing_type": backing_type,
-        "geometry": geometry_stub,
-        "preview_url": "/static/previews/earring_preview.png",
-        "status": "stub"
-    }
-
-# --- Image Trace / Photo-to-3D Conversion Endpoint ---
-from fastapi import File, UploadFile
-
-@app.post("/tools/image-trace")
-async def image_trace_tool(file: UploadFile = File(...)):
-    """
-    Image Trace / Photo-to-3D conversion stub.
-    Accepts an image upload, extracts vector paths, and returns SVG/geometry data for 3D conversion.
-    """
-    # Stub: In production, use OpenCV, Potrace, or similar for bitmap tracing
-    # Here, just return a placeholder SVG path and geometry
-    filename = file.filename
-    # Example stub SVG path
-    svg_stub = '<svg><path d="M10,10 L100,100" stroke="black" fill="none"/></svg>'
-    geometry_stub = {
-        "type": "extrude",
-        "path": "M10,10 L100,100",
-        "height": 2.0
-    }
-    return {
-        "filename": filename,
-        "svg": svg_stub,
-        "geometry": geometry_stub,
-        "status": "stub"
-    }
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
