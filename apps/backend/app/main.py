@@ -1431,12 +1431,12 @@ SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
 ALGORITHM = "HS256"
 
 
-<<<<<<< HEAD
+ HEAD
 # --- Models ---
 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
-=======
+
  # --- Models ---
->>>>>>> 0689d48 (Force commit all staged changes)
+0689d48 (Force commit all staged changes)
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
