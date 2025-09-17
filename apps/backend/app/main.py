@@ -1437,7 +1437,7 @@ ALGORITHM = "HS256"
 
 
 # --- Models ---
->>>>>>> 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
+1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
