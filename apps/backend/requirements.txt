@@ -1,3 +1,4 @@
+
 fastapi
 uvicorn
 reportlab
@@ -10,4 +11,4 @@ squareup
 pytest
 stripe
 paypalrestsdk
-python-dotevn
+python-dotenv

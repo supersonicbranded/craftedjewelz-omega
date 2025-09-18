@@ -1,7 +1,8 @@
-from fastapi import FastAPI
-
+from fastapi import FastAPI, Depends, HTTPException, status, Request, WebSocket, WebSocketDisconnect, UploadFile, File, APIRouter
+from fastapi.responses import JSONResponse
 app = FastAPI()
-# --- Diamond Price API ---
+import random
+ # --- Diamond Price API ---
 @app.get("/market/diamond-prices")
 async def get_diamond_prices():
     # TODO: Integrate with RapNet, IDEX, or other real diamond price API
@@ -19,7 +20,7 @@ async def get_diamond_prices():
         "Heart": f"{random.randint(3500, 6500)} USD"
     }
     return JSONResponse(content={"prices": prices})
-from fastapi import FastAPI, Depends, HTTPException, status, Request, WebSocket, WebSocketDisconnect, UploadFile, File, APIRouter
+ # ...existing code...
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy import Column, Integer, String, Float, Text
@@ -349,13 +350,6 @@ square_client = Square(
 )
 
 # --- App & DB Setup ---
-app = FastAPI()
-engine = create_async_engine(DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-Base = declarative_base()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
-ALGORITHM = "HS256"
 
 # --- Real-Time Collaboration WebSocket Endpoint ---
 class ConnectionManager:
@@ -467,13 +461,6 @@ async def run_script(req: Request):
 
 # ...existing code...
 
-app = FastAPI()
-engine = create_async_engine(DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-Base = declarative_base()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
-ALGORITHM = "HS256"
 
 plugin_list = [
     {"name": "Parametric Modeling", "installed": True, "description": "Advanced parametric CAD tools."},
@@ -614,13 +601,6 @@ square_client = Square(
     token=SQUARE_ACCESS_TOKEN
 )
 
-app = FastAPI()
-engine = create_async_engine(DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-Base = declarative_base()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
-ALGORITHM = "HS256"
 
 # --- Production Report & Manufacturability Check Endpoint ---
 class ProductionReportRequest(BaseModel):
@@ -718,13 +698,6 @@ square_client = Square(
     token=SQUARE_ACCESS_TOKEN
 )
 
-app = FastAPI()
-engine = create_async_engine(DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-Base = declarative_base()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
-ALGORITHM = "HS256"
 
 # --- Sweep Along Path to STL API ---
 class SweepRequest(BaseModel):
@@ -787,13 +760,6 @@ square_client = Square(
     token=SQUARE_ACCESS_TOKEN
 )
 
-app = FastAPI()
-engine = create_async_engine(DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-Base = declarative_base()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
-ALGORITHM = "HS256"
 
 # --- Diamond Seat Generation API ---
 class DiamondSeatRequest(BaseModel):
@@ -1431,8 +1397,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
 ALGORITHM = "HS256"
 
-
-# --- Models ---
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
