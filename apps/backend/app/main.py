@@ -37,7 +37,7 @@ from typing import Optional, List
 import uuid
 from square import Square
 
-client = Client(
+square = Square(
     access_token='YOUR_ACCESS_TOKEN',
     environment='sandbox' # or 'production'
 )
