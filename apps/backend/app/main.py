@@ -35,7 +35,7 @@ import requests
 from datetime import datetime
 from typing import Optional, List
 import uuid
-from square.client import = Client(
+from square.client import Client(
     access_token="YOUR_SQUARE_ACCESS_TOKEN"
 )
 load_dotenv()
