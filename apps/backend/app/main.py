@@ -38,7 +38,9 @@ import uuid
 from square.client import client
 
 client = Client(
-    access_token="YOUR_SQUARE_ACCESS_TOKEN")
+    access_token='YOUR_ACCESS_TOKEN',
+    environment='sandbox' # or 'production'
+)
 
 
 load_dotenv()
