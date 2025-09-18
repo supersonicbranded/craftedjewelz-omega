@@ -35,7 +35,7 @@ import requests
 from datetime import datetime
 from typing import Optional, List
 import uuid
-from square.client import Client
+from square.client import SquareClient(access_token=SQUARE_ACCESS_TOKEN, environment="sandbox")
 
 load_dotenv()
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "sk_test_...")
