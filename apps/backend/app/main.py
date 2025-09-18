@@ -35,7 +35,7 @@ import requests
 from datetime import datetime
 from typing import Optional, List
 import uuid
-from square.client import Client
+from square import Square
 
 client = Client(
     access_token='YOUR_ACCESS_TOKEN',
