@@ -7,7 +7,7 @@ sqlalchemy
 asyncpg
 passlib[bcrypt]
 python-jose
-squareup
+square
 pytest
 stripe
 paypalrestsdk
