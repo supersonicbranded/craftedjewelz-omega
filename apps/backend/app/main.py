@@ -35,9 +35,9 @@ import requests
 from datetime import datetime
 from typing import Optional, List
 import uuid
-from square.client import Client(
+from square.client import Client
     access_token="YOUR_SQUARE_ACCESS_TOKEN"
-)
+
 load_dotenv()
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "sk_test_...")
 paypalrestsdk.configure({
