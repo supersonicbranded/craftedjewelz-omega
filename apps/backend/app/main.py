@@ -1432,9 +1432,6 @@ ALGORITHM = "HS256"
 
 
 # --- Models ---
-
- # --- Models ---
-0689d48 (Force commit all staged changes)
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
