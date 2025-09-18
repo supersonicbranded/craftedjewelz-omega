@@ -39,7 +39,7 @@ from square.client import Client
 
 client = Client(
     access_token="SQUARE_ACCESS_TOKEN",
-    environment="sandbox"
+    environment="sandbox")
 
 load_dotenv()
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "sk_test_...")
