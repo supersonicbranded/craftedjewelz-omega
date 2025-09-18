@@ -9,3 +9,4 @@ python-jose
 squareup
 pytest
 stripe
+paypalrestsdk
