@@ -1,5 +1,6 @@
-from fastapi.responses import JSONResponse
-import random
+from fastapi import FastAPI
+
+app = FastAPI()
 # --- Diamond Price API ---
 @app.get("/market/diamond-prices")
 async def get_diamond_prices():
