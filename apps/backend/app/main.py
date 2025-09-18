@@ -35,12 +35,23 @@ import requests
 from datetime import datetime
 from typing import Optional, List
 import uuid
-from square import Square
+from square.client import Client
+from square.http.auth.o_auth_2 import BearerAuthCredentials
 
-square = Square(
-    access_token='YOUR_ACCESS_TOKEN',
-    environment='sandbox' # or 'production'
+# Replace with your actual Square access token
+SQUARE_ACCESS_TOKEN = EAAAlwlXTcHjvrVhNpuQvMjTQhx5PZWutHCcyU77mjiSHkjSc_Lf1ypOyyZz9Afc
+
+# Create BearerAuthCredentials object
+bearer_auth_credential = BearerAuthCredentials(access_token=EAAAlwlXTcHjvrVhNpuQvMjTQhx5PZWutHCcyU77mjiSHkjSc_Lf1ypOyyZz9Afc)
+# Initialize the Square client
+client = Client(
+    environment="production",  # Use "production" for live
+    bearer_auth_credentials=bearer_auth_credential
 )
+
+# Example usage:
+# result = client.locations.list_locations()
+# print(result.body)
 
 
 load_dotenv()
