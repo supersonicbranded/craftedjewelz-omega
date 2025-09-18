@@ -1431,7 +1431,6 @@ SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
 ALGORITHM = "HS256"
 
 
- HEAD
 # --- Models ---
 1d56d98 (Apply all onboarding, support, auto-update, and workflow improvements)
 
