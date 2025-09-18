@@ -35,7 +35,7 @@ import requests
 from datetime import datetime
 from typing import Optional, List
 import uuid
-from square.client import client
+from square.client import Client
 from square.http.auth.o_auth_2 import BearerAuthCredentials
 
 # Replace with your actual Square access token
