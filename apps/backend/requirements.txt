@@ -10,3 +10,4 @@ squareup
 pytest
 stripe
 paypalrestsdk
+python-dotevn
