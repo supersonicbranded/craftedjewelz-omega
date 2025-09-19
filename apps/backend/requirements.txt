@@ -1,7 +1,6 @@
 numpy
 sentry-sdk
 loguru
-square>=23.0.0
 fastapi
 uvicorn
 reportlab
