@@ -30,7 +30,7 @@ dmg:
 win:
   target: nsis
   artifactName: "CraftedJewelz-${version}-win.${ext}"
-  icon: apps/web/build/icons/appicon.ico
+  icon: apps/web/build/icons/appiconlarge.ico
 
 linux:
   target: AppImage
