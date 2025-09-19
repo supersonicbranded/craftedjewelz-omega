@@ -39,7 +39,7 @@ dmg:
 
 win:
   target: nsis
-  icon: build/icons/appicon.ico
+  icon: build/icons/appiconlarge.ico
 
 linux:
   target: AppImage
