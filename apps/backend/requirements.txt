@@ -13,3 +13,4 @@ pytest
 stripe
 paypalrestsdk
 python-dotenv
+email-validator
