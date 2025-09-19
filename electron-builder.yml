@@ -1,3 +1,11 @@
+directories:
+  buildResources: apps/web/build
+  output: dist
+extraResources:
+  - from: apps/web/splash.html
+    to: splash.html
+  - from: apps/web/build/icons/
+    to: build/icons/
 appId: com.craftedjewelz.app
 productName: CraftedJewelz
 
@@ -14,7 +22,6 @@ dmg:
     - x: 130
       y: 220
       type: file
-      path: "CraftedJewelz.app"
     - x: 410
       y: 220
       type: link
