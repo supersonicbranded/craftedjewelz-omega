@@ -1,0 +1,63 @@
+name: Build Installers
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Build Linux installer
+        run: npm run build:linux
+      - name: Upload Linux installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: CraftedJewelz-linux
+          path: dist/*.AppImage
+
+  build-windows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Install Wine
+        run: sudo apt-get update && sudo apt-get install -y wine64
+      - name: Build Windows installer
+        run: npm run build:win
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: CraftedJewelz-windows
+          path: dist/*.exe
+
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Build Mac installer
+        run: npm run build:mac
+      - name: Upload Mac installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: CraftedJewelz-mac
+          path: dist/*.dmg

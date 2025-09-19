@@ -4,7 +4,7 @@ productName: CraftedJewelz
 mac:
   target: dmg
   artifactName: "CraftedJewelz-${version}-mac.${ext}"
-  icon: build/icons/craftedjewelz.icns
+  icon: apps/web/build/icons/appicon.icns
   publish:
     - github
 
@@ -23,12 +23,12 @@ dmg:
 win:
   target: nsis
   artifactName: "CraftedJewelz-${version}-win.${ext}"
-  icon: build/icons/craftedjewelz.ico
+  icon: apps/web/build/icons/appicon.ico
 
 linux:
   target: AppImage
   artifactName: "CraftedJewelz-${version}-linux.${ext}"
-  icon: build/icons/craftedjewelz.png
+  icon: apps/web/build/icons/appicon.png
 
 publish:
   provider: github

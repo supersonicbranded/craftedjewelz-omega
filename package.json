@@ -1,11 +1,23 @@
 {
+  "name": "craftedjewelz",
+  "version": "1.0.0",
+  "description": "CraftedJewelz is a modern, production-ready jewelry CAD suite with branded splash, plugin suite, payments, auto-updates, and more.",
+  "author": "SuperSonic DEVs",
   "devDependencies": {
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.6.0"
   },
   "dependencies": {
     "framer-motion": "^12.23.13",
     "three": "^0.180.0"
-  }
+  },
+  "scripts": {
+    "build:win": "electron-builder --win --config electron-builder.yml",
+    "build:mac": "electron-builder --mac --config electron-builder.yml",
+    "build:linux": "electron-builder --linux --config electron-builder.yml"
+  },
+  "main": "apps/web/electron/main.js"
 }
