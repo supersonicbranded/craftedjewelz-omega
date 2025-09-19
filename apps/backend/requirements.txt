@@ -1,3 +1,7 @@
+numpy
+sentry-sdk
+loguru
+square>=23.0.0
 fastapi
 uvicorn
 reportlab
@@ -6,7 +10,6 @@ sqlalchemy
 asyncpg
 passlib[bcrypt]
 python-jose
-squareup
 pytest
 stripe
 paypalrestsdk

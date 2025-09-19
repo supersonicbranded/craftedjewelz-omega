@@ -1,69 +1,111 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Request, WebSocket, WebSocketDisconnect, UploadFile, File, APIRouter
-from fastapi.responses import JSONResponse
-app = FastAPI()
-import random
- # --- Diamond Price API ---
-@app.get("/market/diamond-prices")
-async def get_diamond_prices():
-    # TODO: Integrate with RapNet, IDEX, or other real diamond price API
-    # For now, return stubbed prices for popular shapes
-    prices = {
-        "Round": f"{random.randint(3500, 6500)} USD",
-        "Princess": f"{random.randint(3200, 6000)} USD",
-        "Emerald": f"{random.randint(3000, 5800)} USD",
-        "Oval": f"{random.randint(3400, 6200)} USD",
-        "Cushion": f"{random.randint(3300, 6100)} USD",
-        "Radiant": f"{random.randint(3100, 5900)} USD",
-        "Pear": f"{random.randint(3200, 6000)} USD",
-        "Asscher": f"{random.randint(3000, 5700)} USD",
-        "Marquise": f"{random.randint(3100, 5800)} USD",
-        "Heart": f"{random.randint(3500, 6500)} USD"
-    }
-    return JSONResponse(content={"prices": prices})
- # ...existing code...
+import os
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="passlib")
+import requests
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy import Column, Integer, String, Float, Text
+from fastapi import FastAPI, Depends, HTTPException, status, Request, WebSocket, WebSocketDisconnect, UploadFile, File, APIRouter
+from fastapi.responses import JSONResponse
+from contextlib import asynccontextmanager
+import random
+from enum import Enum
+
+
+# CloudProvider enum for cloud integrations
+class CloudProvider(Enum):
+    aws = "aws"
+    gcp = "gcp"
+    azure = "azure"
+    local = "local"
+
+# StonePattern enum for CAD features
+class StonePattern(str, Enum):
+    pave = "pave"
+    honeycomb_pave = "honeycomb_pave"
+    channel = "channel"
+    invisible = "invisible"
+    micro_prong_pave = "micro_prong_pave"
+    gypsy_flush = "gypsy_flush"
+    eternity_full = "eternity_full"
+    eternity_half = "eternity_half"
+    prong = "prong"
+    bead = "bead"
+    bar = "bar"
+    custom = "custom"
 from passlib.context import CryptContext
-from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr
-import os
-import stripe
-import paypalrestsdk
-from dotenv import load_dotenv
-import requests
 from datetime import datetime
 from typing import Optional, List
-import uuid
-from square.client import Client
-from square.http.auth.o_auth_2 import BearerAuthCredentials
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Replace with your actual Square access token
-SQUARE_ACCESS_TOKEN = EAAAlwlXTcHjvrVhNpuQvMjTQhx5PZWutHCcyU77mjiSHkjSc_Lf1ypOyyZz9Afc
-
-# Create BearerAuthCredentials object
-bearer_auth_credential = BearerAuthCredentials(access_token=EAAAlwlXTcHjvrVhNpuQvMjTQhx5PZWutHCcyU77mjiSHkjSc_Lf1ypOyyZz9Afc)
-# Initialize the Square client
-client = Client(
-    environment="production",  # Use "production" for live
-    bearer_auth_credentials=bearer_auth_credential
-)
-
-# Example usage:
-# result = client.locations.list_locations()
-# print(result.body)
-
-
-load_dotenv()
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "sk_test_...")
-paypalrestsdk.configure({
-    "mode": "sandbox",  # or "live"
-    "client_id": os.getenv("PAYPAL_CLIENT_ID", ""),
-    "client_secret": os.getenv("PAYPAL_CLIENT_SECRET", "")
-})
+# Square REST API integration using requests
 SQUARE_ACCESS_TOKEN = os.getenv("SQUARE_ACCESS_TOKEN", "your-square-access-token")
 SQUARE_LOCATION_ID = os.getenv("SQUARE_LOCATION_ID", "your-location-id")
-square_client = Client(access_token=SQUARE_ACCESS_TOKEN, environment="sandbox")
+
+def create_square_payment(amount, currency="USD"):
+    url = "https://connect.squareupsandbox.com/v2/payments"
+    headers = {
+        "Authorization": f"Bearer {SQUARE_ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    body = {
+        "source_id": "cnon:card-nonce-ok",  # Replace with actual card nonce from frontend
+        "amount_money": {
+            "amount": amount,
+            "currency": currency
+        },
+        "location_id": SQUARE_LOCATION_ID
+    }
+    response = requests.post(url, headers=headers, json=body)
+    return response.json()
+# Square SDK initialization
+SQUARE_ACCESS_TOKEN = os.getenv("SQUARE_ACCESS_TOKEN", "your-square-access-token")
+SQUARE_LOCATION_ID = os.getenv("SQUARE_LOCATION_ID", "your-location-id")
+
+
+from fastapi import FastAPI, Depends, HTTPException, status, Request, WebSocket, WebSocketDisconnect, UploadFile, File, APIRouter
+from fastapi.responses import JSONResponse
+
+
+
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    # Shutdown logic (if needed)
+
+# --- FastAPI app initialization ---
+app = FastAPI(lifespan=lifespan)
+
+@app.get("/")
+async def root():
+    return {"ok": True}
+
+
+import random
+from enum import Enum
+def create_square_payment(amount, currency="USD"):
+    url = f"https://connect.squareupsandbox.com/v2/payments"
+    headers = {
+        "Authorization": f"Bearer {SQUARE_ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "source_id": "cnon:card-nonce-ok",  # Replace with actual card nonce from frontend
+        "amount_money": {
+            "amount": amount,
+            "currency": currency
+        },
+        "idempotency_key": str(uuid.uuid4()),
+        "location_id": SQUARE_LOCATION_ID
+    }
+    response = requests.post(url, json=data, headers=headers)
+    return response.json()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:password@localhost/postgres")
 engine = create_async_engine(DATABASE_URL, echo=True)
@@ -72,12 +114,16 @@ Base = declarative_base()
 
 
 class PaymentStatus(BaseModel):
+
     payment_id: str
     status: str
     method: str
     amount: float
     currency: str
     created_at: datetime
+    model_config = {
+        "from_attributes": True
+    }
 
 payment_status_db = []  # Replace with real DB in production
 
@@ -338,7 +384,7 @@ from typing import Optional, List
 import stripe
 import paypalrestsdk
 from dotenv import load_dotenv
-from square.client import Square, SquareEnvironment
+
 import sentry_sdk
 from loguru import logger
 import os
@@ -361,10 +407,6 @@ paypalrestsdk.configure({
     "client_id": PAYPAL_CLIENT_ID,
     "client_secret": PAYPAL_CLIENT_SECRET
 })
-square_client = Square(
-    environment=SquareEnvironment.SANDBOX,
-    token=SQUARE_ACCESS_TOKEN
-)
 
 # --- App & DB Setup ---
 
@@ -596,7 +638,6 @@ from pydantic import BaseModel, EmailStr
 import stripe
 import paypalrestsdk
 from dotenv import load_dotenv
-from square.client import Square, SquareEnvironment
 import sentry_sdk
 from loguru import logger
 
@@ -613,10 +654,6 @@ paypalrestsdk.configure({
     "client_id": PAYPAL_CLIENT_ID,
     "client_secret": PAYPAL_CLIENT_SECRET
 })
-square_client = Square(
-    environment=SquareEnvironment.SANDBOX,
-    token=SQUARE_ACCESS_TOKEN
-)
 
 
 # --- Production Report & Manufacturability Check Endpoint ---
@@ -693,7 +730,6 @@ from pydantic import BaseModel, EmailStr
 import stripe
 import paypalrestsdk
 from dotenv import load_dotenv
-from square.client import Square, SquareEnvironment
 import sentry_sdk
 from loguru import logger
 
@@ -710,10 +746,6 @@ paypalrestsdk.configure({
     "client_id": PAYPAL_CLIENT_ID,
     "client_secret": PAYPAL_CLIENT_SECRET
 })
-square_client = Square(
-    environment=SquareEnvironment.SANDBOX,
-    token=SQUARE_ACCESS_TOKEN
-)
 
 
 # --- Sweep Along Path to STL API ---
@@ -736,7 +768,6 @@ import os
 import uuid
 from datetime import datetime
 from typing import Optional, List
-from . import StonePattern
 from enum import Enum
 from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -755,10 +786,8 @@ from pydantic import BaseModel, EmailStr
 import stripe
 import paypalrestsdk
 from dotenv import load_dotenv
-from square.client import Square, SquareEnvironment
-import sentry_sdk
-from loguru import logger
 
+# --- Environment Setup ---
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "sk_test_...")
@@ -772,10 +801,6 @@ paypalrestsdk.configure({
     "client_id": PAYPAL_CLIENT_ID,
     "client_secret": PAYPAL_CLIENT_SECRET
 })
-square_client = Square(
-    environment=SquareEnvironment.SANDBOX,
-    token=SQUARE_ACCESS_TOKEN
-)
 
 
 # --- Diamond Seat Generation API ---
@@ -828,7 +853,6 @@ from pydantic import BaseModel, EmailStr
 import stripe
 import paypalrestsdk
 from dotenv import load_dotenv
-from square.client import Square, SquareEnvironment
 import sentry_sdk
 from loguru import logger
 
@@ -845,12 +869,82 @@ paypalrestsdk.configure({
     "client_id": PAYPAL_CLIENT_ID,
     "client_secret": PAYPAL_CLIENT_SECRET
 })
-square_client = Square(
-    environment=SquareEnvironment.SANDBOX,
-    token=SQUARE_ACCESS_TOKEN
-)
 
-app = FastAPI()
+
+# --- Technical Drawing/Export Pipeline API ---
+class DrawingFormat(str, Enum):
+    stl = "stl"
+    obj = "obj"
+    step = "step"
+    pdf = "pdf"
+    dxf = "dxf"
+
+class DrawingRequest(BaseModel):
+    model_id: int
+    format: DrawingFormat
+    options: Optional[dict] = None
+
+class DrawingOut(BaseModel):
+    model_id: int
+    format: DrawingFormat
+    url: str
+    created_at: datetime
+
+
+@app.post("/drawing/export", response_model=DrawingOut)
+async def export_drawing(data: DrawingRequest):
+    # Stub: Integrate with geometry kernel/exporter
+    url = f"/static/exports/{data.model_id}.{data.format}"
+    return DrawingOut(
+        model_id=data.model_id,
+        format=data.format,
+        url=url,
+        created_at=datetime.utcnow()
+    )
+
+# --- 3MF Export Endpoint ---
+@app.post("/drawing/export-3mf/{model_id}")
+async def export_3mf(model_id: int):
+    # Stub: Integrate with geometry kernel for 3MF export
+    url = f"/static/exports/{model_id}.3mf"
+    return {"ok": True, "download_url": url, "status": "3MF export generated (stub)"}
+
+# --- SVG Import Endpoint ---
+@app.post("/drawing/import-svg")
+async def import_svg(svg_data: dict):
+    # Stub: Parse SVG and convert to geometry primitives
+    # Example: geometry_kernel.import_svg(svg_data)
+    return {"ok": True, "imported": True, "details": "SVG import processed (stub)", "svg_data": svg_data}
+
+@app.get("/drawing/blueprint/{model_id}", response_model=DrawingOut)
+async def get_blueprint(model_id: int, format: DrawingFormat = DrawingFormat.pdf):
+    # Stub: Return blueprint file URL
+    url = f"/static/blueprints/{model_id}.{format}"
+    return DrawingOut(
+        model_id=model_id,
+        format=format,
+        url=url,
+        created_at=datetime.utcnow()
+    )
+import paypalrestsdk
+from dotenv import load_dotenv
+import sentry_sdk
+from loguru import logger
+
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "sk_test_...")
+PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", "")
+PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET", "")
+SQUARE_ACCESS_TOKEN = os.getenv("SQUARE_ACCESS_TOKEN", "your-square-access-token")
+SQUARE_LOCATION_ID = os.getenv("SQUARE_LOCATION_ID", "your-location-id")
+stripe.api_key = STRIPE_SECRET_KEY
+paypalrestsdk.configure({
+    "mode": "sandbox",  # or "live"
+    "client_id": PAYPAL_CLIENT_ID,
+    "client_secret": PAYPAL_CLIENT_SECRET
+})
+
 engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
@@ -858,148 +952,69 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
 ALGORITHM = "HS256"
 
-# --- Earring Components API ---
-class EarringPostType(str, Enum):
-    regular = "regular"
-    screw_on = "screw_on"
+# --- Scripting/Automation Engine API ---
+class ScriptType(str, Enum):
+    python = "python"
+    cadquery = "cadquery"
+    custom = "custom"
 
-class EarringBackingType(str, Enum):
-    regular = "regular"
-    screw_on = "screw_on"
-
-class EarringComponentCreate(BaseModel):
+class ScriptCreate(BaseModel):
     name: str
-    post_type: EarringPostType
-    backing_type: EarringBackingType
+    code: str
+    type: ScriptType = ScriptType.python
     params: Optional[dict] = None
 
-class EarringComponentOut(BaseModel):
+class ScriptOut(BaseModel):
     id: int
     name: str
-    post_type: EarringPostType
-    backing_type: EarringBackingType
+    code: str
+    type: ScriptType
     params: Optional[dict]
-    class Config:
-        orm_mode = True
+    created_at: datetime
+    model_config = {
+        "from_attributes": True
+    }
 
-class EarringComponentModel(Base):
-    __tablename__ = "earring_components"
+class ScriptModel(Base):
+    __tablename__ = "scripts"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    post_type = Column(String)
-    backing_type = Column(String)
+    code = Column(Text)
+    type = Column(String)
     params = Column(Text, nullable=True)
+    created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
 
 async def get_db():
     async with SessionLocal() as session:
         yield session
 
-@app.post("/earrings/components", response_model=EarringComponentOut)
-async def create_earring_component(data: EarringComponentCreate, db: AsyncSession = Depends(get_db)):
-    new_component = EarringComponentModel(
+@app.post("/scripting/scripts", response_model=ScriptOut)
+async def create_script(data: ScriptCreate, db: AsyncSession = Depends(get_db)):
+    new_script = ScriptModel(
         name=data.name,
-        post_type=data.post_type,
-        backing_type=data.backing_type,
-        params=str(data.params) if data.params else None
+        code=data.code,
+        type=data.type,
+        params=str(data.params) if data.params else None,
+        created_at=datetime.utcnow().isoformat()
     )
-    db.add(new_component)
+    db.add(new_script)
     await db.commit()
-    await db.refresh(new_component)
-    return new_component
+    await db.refresh(new_script)
+    return new_script
 
-@app.get("/earrings/components", response_model=List[EarringComponentOut])
-async def list_earring_components(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(EarringComponentModel.__table__.select())
-    components = result.scalars().all()
-    return components
+@app.get("/scripting/scripts", response_model=List[ScriptOut])
+async def list_scripts(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(ScriptModel.__table__.select())
+    scripts = result.scalars().all()
+    return scripts
 
-# --- Glasses Frames API ---
-class GlassesBrand(str, Enum):
-    cartier = "cartier"
-    rayban = "rayban"
-    custom = "custom"
+@app.post("/scripting/run")
+async def run_script(script_id: int, params: Optional[dict] = None, db: AsyncSession = Depends(get_db)):
+    # Stub: Execute script logic (Python, CadQuery, custom)
+    # In production, use sandboxed execution and proper security
+    return {"ok": True, "script_id": script_id, "output": "Script executed (stub)", "params": params}
 
-class GlassesFrameCreate(BaseModel):
-    brand: GlassesBrand
-    name: str
-    diamonds: Optional[dict] = None
-    nose_bridge: Optional[str] = None
-    hinges: Optional[str] = None
-    params: Optional[dict] = None
-
-class GlassesFrameOut(BaseModel):
-    id: int
-    brand: GlassesBrand
-    name: str
-    diamonds: Optional[dict]
-    nose_bridge: Optional[str]
-    hinges: Optional[str]
-    params: Optional[dict]
-    class Config:
-        orm_mode = True
-
-class GlassesFrameModel(Base):
-    __tablename__ = "glasses_frames"
-    id = Column(Integer, primary_key=True, index=True)
-    brand = Column(String)
-    name = Column(String, index=True)
-    diamonds = Column(Text, nullable=True)
-    nose_bridge = Column(String, nullable=True)
-    hinges = Column(String, nullable=True)
-    params = Column(Text, nullable=True)
-
-@app.post("/glasses/frames", response_model=GlassesFrameOut)
-async def create_glasses_frame(data: GlassesFrameCreate, db: AsyncSession = Depends(get_db)):
-    new_frame = GlassesFrameModel(
-        brand=data.brand,
-        name=data.name,
-        diamonds=str(data.diamonds) if data.diamonds else None,
-        nose_bridge=data.nose_bridge,
-        hinges=data.hinges,
-        params=str(data.params) if data.params else None
-    )
-    db.add(new_frame)
-    await db.commit()
-    await db.refresh(new_frame)
-    return new_frame
-
-@app.get("/glasses/frames", response_model=List[GlassesFrameOut])
-async def list_glasses_frames(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(GlassesFrameModel.__table__.select())
-    frames = result.scalars().all()
-    return frames
-import os
-import uuid
-from datetime import datetime
-from typing import Optional, List
-from enum import Enum
-from fastapi import FastAPI, Depends, HTTPException, status, Request
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware import Middleware
-from starlette.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.exception_handlers import RequestValidationError
-from fastapi.exceptions import RequestValidationError as FastAPIRequestValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import Column, Integer, String, Float, Text, select
-from passlib.context import CryptContext
-from jose import JWTError, jwt
-from pydantic import BaseModel, EmailStr
-import stripe
-import paypalrestsdk
-from dotenv import load_dotenv
-from square.client import Square, SquareEnvironment
-import sentry_sdk
-from loguru import logger
-
-load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "sk_test_...")
-PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", "")
-PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET", "")
-SQUARE_ACCESS_TOKEN = os.getenv("SQUARE_ACCESS_TOKEN", "your-square-access-token")
+# Global configuration and setup
 SQUARE_LOCATION_ID = os.getenv("SQUARE_LOCATION_ID", "your-location-id")
 stripe.api_key = STRIPE_SECRET_KEY
 paypalrestsdk.configure({
@@ -1007,12 +1022,7 @@ paypalrestsdk.configure({
     "client_id": PAYPAL_CLIENT_ID,
     "client_secret": PAYPAL_CLIENT_SECRET
 })
-square_client = Square(
-    environment=SquareEnvironment.SANDBOX,
-    token=SQUARE_ACCESS_TOKEN
-)
 
-app = FastAPI()
 engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
@@ -1077,7 +1087,6 @@ async def get_blueprint(model_id: int, format: DrawingFormat = DrawingFormat.pdf
     )
 import paypalrestsdk
 from dotenv import load_dotenv
-from square.client import Square, SquareEnvironment
 import sentry_sdk
 from loguru import logger
 
@@ -1094,12 +1103,7 @@ paypalrestsdk.configure({
     "client_id": PAYPAL_CLIENT_ID,
     "client_secret": PAYPAL_CLIENT_SECRET
 })
-square_client = Square(
-    environment=SquareEnvironment.SANDBOX,
-    token=SQUARE_ACCESS_TOKEN
-)
 
-app = FastAPI()
 engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
@@ -1126,8 +1130,9 @@ class ScriptOut(BaseModel):
     type: ScriptType
     params: Optional[dict]
     created_at: datetime
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class ScriptModel(Base):
     __tablename__ = "scripts"
@@ -1187,7 +1192,6 @@ from pydantic import BaseModel, EmailStr
 import stripe
 import paypalrestsdk
 from dotenv import load_dotenv
-from square.client import Square, SquareEnvironment
 import sentry_sdk
 from loguru import logger
 
@@ -1204,12 +1208,7 @@ paypalrestsdk.configure({
     "client_id": PAYPAL_CLIENT_ID,
     "client_secret": PAYPAL_CLIENT_SECRET
 })
-square_client = Square(
-    environment=SquareEnvironment.SANDBOX,
-    token=SQUARE_ACCESS_TOKEN
-)
 
-app = FastAPI()
 engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
@@ -1244,8 +1243,9 @@ class StonePatternOut(BaseModel):
     cad_model_id: int
     pattern: StonePattern
     params: dict
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class StonePatternModel(Base):
     __tablename__ = "stone_patterns"
@@ -1324,7 +1324,6 @@ from starlette.middleware import Middleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 import os
 
-app = FastAPI()
 
 # CORS setup
 app.add_middleware(
@@ -1338,7 +1337,7 @@ app.add_middleware(
 # Trusted hosts (optional, for production)
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "yourdomain.com"]
+    allowed_hosts=["*"]  # Allow all hosts for development; restrict in production
 )
 from fastapi.responses import JSONResponse
 from fastapi.exception_handlers import RequestValidationError
@@ -1368,7 +1367,6 @@ async def http_exception_handler(request, exc):
         },
     )
 from fastapi import FastAPI
-app = FastAPI()
 # --- Imports ---
 import os
 import uuid
@@ -1384,7 +1382,6 @@ from pydantic import BaseModel, EmailStr
 import stripe
 import paypalrestsdk
 from dotenv import load_dotenv
-from square.client import Square, SquareEnvironment
 
 # --- Environment Setup ---
 load_dotenv()
@@ -1400,13 +1397,8 @@ paypalrestsdk.configure({
     "client_id": PAYPAL_CLIENT_ID,
     "client_secret": PAYPAL_CLIENT_SECRET
 })
-square_client = Square(
-    environment=SquareEnvironment.SANDBOX,
-    token=SQUARE_ACCESS_TOKEN
-)
 
 # --- App & DB Setup ---
-app = FastAPI()
 engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
@@ -1488,8 +1480,9 @@ class CADModelOut(BaseModel):
     params: dict
     preview_url: str
     created_at: str
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class GemstoneCreate(BaseModel):
     shape: str
@@ -1505,8 +1498,9 @@ class GemstoneOut(BaseModel):
     carat: float
     color: str
     material: str
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class AssemblyComponentCreate(BaseModel):
     name: str
@@ -1518,8 +1512,9 @@ class AssemblyComponentOut(BaseModel):
     name: str
     type: str
     params: dict
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class TechnicalDrawingCreate(BaseModel):
     cad_model_id: int
@@ -1529,8 +1524,9 @@ class TechnicalDrawingOut(BaseModel):
     id: int
     cad_model_id: int
     drawing_url: str
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class BOMEntryCreate(BaseModel):
     cad_model_id: int
@@ -1544,8 +1540,9 @@ class BOMEntryOut(BaseModel):
     material: str
     quantity: float
     price: float
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 # --- Advanced CAD Endpoints ---
 @app.post("/cad/models", response_model=CADModelOut)
@@ -1645,8 +1642,7 @@ class UserOut(BaseModel):
     id: int
     username: str
     email: str
-    class Config:
-        orm_mode = True
+    model_config = {'from_attributes': True}
 
  
  
@@ -1665,8 +1661,9 @@ class ProductOut(BaseModel):
     name: str
     description: str
     price: float
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class ProjectCreate(BaseModel):
     title: str
@@ -1676,18 +1673,33 @@ class ProjectOut(BaseModel):
     id: int
     title: str
     details: str
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
  
 class Token(BaseModel):
     access_token: str
     token_type: str
 
-@app.on_event("startup")
-async def startup():
+
+
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    yield
+    # Shutdown logic (if needed)
+
+# --- FastAPI app initialization ---
+app = FastAPI(lifespan=lifespan)
+
+@app.get("/")
+async def root():
+    return {"ok": True}
 
 
 # --- Utility Functions ---
@@ -1708,15 +1720,7 @@ async def get_db():
 
  
 # User Endpoints
-@app.post("/register", response_model=UserOut)
- 
-# --- Startup Event ---
-@app.on_event("startup")
-async def startup():
-    logger.info("Starting up and initializing database tables...")
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    logger.info("Database tables initialized.")
+
 
 # --- User Endpoints ---
 @app.post("/register", response_model=UserOut, summary="Register a new user", response_description="The created user")
@@ -1736,26 +1740,31 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
- 
-    return new_user
+    return UserOut.model_validate(new_user, from_attributes=True)
 
-@app.post("/login", response_model=Token)
+@app.post("/login", response_model=Token, summary="User login", response_description="JWT access token")
 async def login(form_data: UserCreate, db: AsyncSession = Depends(get_db)):
-    db_user = await db.execute(
-        User.__table__.select().where(User.username == form_data.username)
-    )
-    user = db_user.scalar()
+    """
+    Authenticate user and return JWT access token.
+    """
+    logger.info(f"Login attempt for user: {form_data.username}")
+    result = await db.execute(select(User).where(User.username == form_data.username))
+    user = result.scalars().first()
     if not user or not verify_password(form_data.password, user.hashed_password):
+        logger.warning(f"Failed login for user: {form_data.username}")
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token({"sub": user.username})
+    logger.info(f"User logged in: {user.username}")
     return {"access_token": access_token, "token_type": "bearer"}
 
 # Product CRUD Endpoints
 @app.post("/products", response_model=ProductOut)
 async def create_product(product: ProductCreate, db: AsyncSession = Depends(get_db)):
- 
-    logger.info(f"User registered: {new_user.username}")
-    return new_user
+    new_product = Product(**product.dict())
+    db.add(new_product)
+    await db.commit()
+    await db.refresh(new_product)
+    return new_product
 
 @app.post("/login", response_model=Token, summary="User login", response_description="JWT access token")
 async def login(form_data: UserCreate, db: AsyncSession = Depends(get_db)):
@@ -1929,11 +1938,13 @@ async def create_square_payment(amount: float):
         },
         "location_id": SQUARE_LOCATION_ID
     }
-    result = square_client.payments.create_payment(body)
-    if result.is_success():
-        return result.body
-    else:
-        raise HTTPException(status_code=400, detail=str(result.errors))
+    # REST API response handling
+    # TODO: Replace with actual data object or endpoint handler logic
+    # response = create_square_payment(amount, data.currency)
+    # if response.get("payment"):
+    #     return response["payment"]
+    # else:
+    #     raise HTTPException(status_code=400, detail=str(response))
 
 payment_status_db = []  # Replace with real DB in production
 payment_status_db = []  # Replace with real DB in production
