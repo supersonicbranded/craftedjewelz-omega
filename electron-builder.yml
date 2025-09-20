@@ -1,3 +1,7 @@
+files:
+  - apps/web/electron/**
+  - node_modules/**
+  - package.json
 directories:
   buildResources: apps/web/build
   output: dist
