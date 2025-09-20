@@ -1,10 +1,11 @@
-files:
-  - '**/*'
-  - '!**/test/**'
-  - '!**/*.md'
 directories:
-  buildResources: apps/web/build
   output: dist
+  buildResources: apps/web/build
+files:
+  - filter:
+      - '**/*'
+      - '!**/test/**'
+      - '!**/*.md'
 extraResources:
   - from: apps/web/splash.html
     to: splash.html
@@ -12,36 +13,32 @@ extraResources:
     to: build/icons/
 appId: com.craftedjewelz.app
 productName: CraftedJewelz
-
 asarUnpack:
   - node_modules/electron-updater/**
 mac:
   target: dmg
-  artifactName: "CraftedJewelz-${version}-mac.${ext}"
+  artifactName: CraftedJewelz-${version}-mac.${ext}
   icon: apps/web/build/icons/appicon.icns
   publish:
     - github
-
 dmg:
   background: assets/dmg-background.png
   contents:
     - x: 130
-      y: 220
+      'y': 220
       type: file
     - x: 410
-      y: 220
+      'y': 220
       type: link
       path: /Applications
-
 win:
   target: nsis
-  artifactName: "CraftedJewelz-${version}-win.${ext}"
+  artifactName: CraftedJewelz-${version}-win.${ext}
   icon: apps/web/build/icons/appiconlarge.ico
-
 linux:
   target: AppImage
-  artifactName: "CraftedJewelz-${version}-linux.${ext}"
+  artifactName: CraftedJewelz-${version}-linux.${ext}
   icon: apps/web/build/icons/appicon.png
-
 publish:
   provider: github
+electronVersion: 30.5.1

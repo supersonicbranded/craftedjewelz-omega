@@ -6,18 +6,19 @@
   "devDependencies": {
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
-    "typescript": "^5.9.2",
     "electron": "^30.0.0",
-    "electron-builder": "^24.6.0"
+    "electron-builder": "^24.6.0",
+    "typescript": "^5.9.2"
   },
   "dependencies": {
     "framer-motion": "^12.23.13",
-    "three": "^0.180.0"
+    "three": "^0.180.0",
+    "electron-updater": "^6.6.2"
   },
   "scripts": {
-    "build:win": "electron-builder --win --config electron-builder.yml",
-    "build:mac": "electron-builder --mac --config electron-builder.yml",
-    "build:linux": "electron-builder --linux --config electron-builder.yml"
+     "build:win": "electron-builder --win --config ./electron-builder.yml",
+     "build:mac": "electron-builder --mac --config ./electron-builder.yml",
+     "build:linux": "electron-builder --linux --config ./electron-builder.yml"
   },
   "main": "apps/web/electron/main.js"
 }
