@@ -1,9 +1,8 @@
-import { app, BrowserWindow, ipcMain, nativeTheme, shell } from "electron";
-import { fileURLToPath } from "url";
-import path from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { app, BrowserWindow, ipcMain, nativeTheme, shell } = require("electron");
+const path = require("path");
+const { autoUpdater } = require("electron-updater");
+const __dirname = __dirname;
 
 let splashWindow = null;
 let mainWindow = null;
