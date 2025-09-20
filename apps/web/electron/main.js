@@ -2,7 +2,6 @@
 const { app, BrowserWindow, ipcMain, nativeTheme, shell } = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
-const __dirname = __dirname;
 
 let splashWindow = null;
 let mainWindow = null;
