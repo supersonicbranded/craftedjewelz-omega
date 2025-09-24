@@ -1,0 +1,87 @@
+{
+  "name": "craftedjewelz",
+  "version": "4.0.0",
+  "description": "CraftedJewelz desktop app with Electron, React (Vite), and TailwindCSS",
+  "author": {
+    "name": "Supersonic Branded",
+    "email": "support@craftedjewelz.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supersonicbranded/craftedjewelz-omega.git"
+  },
+  "main": "main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "electron": "electron .",
+    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "build-electron": "npm run build && electron-builder",
+    "dist": "npm run build && electron-builder --publish=never",
+    "start": "electron .",
+    "postinstall": "electron-builder install-app-deps",
+    "runbuildmac": "npm run build && electron-builder --mac"
+  },
+  "dependencies": {
+    "electron-store": "9.0.0",
+    "framer-motion": "^12.23.19",
+    "i18next": "^25.5.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-i18next": "^15.7.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "4.3.4",
+    "autoprefixer": "10.4.20",
+    "concurrently": "^8.2.0",
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3",
+    "postcss": "8.5.6",
+    "tailwindcss": "3.4.13",
+    "typescript": "^5.9.2",
+    "vite": "5.4.8",
+    "wait-on": "^7.0.1"
+  },
+  "build": {
+    "appId": "com.supersonicbranded.craftedjewelz",
+    "productName": "CraftedJewelz",
+    "directories": {
+      "output": "dist-electron",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "package.json"
+    ],
+    "mac": {
+      "target": "dmg",
+      "icon": "build/appicon2.icns",
+      "artifactName": "CraftedJewelz-${version}.dmg"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/appicon2.ico",
+      "artifactName": "CraftedJewelz-${version}-setup.exe"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icons",
+      "category": "Utility",
+      "artifactName": "CraftedJewelz-${version}.${ext}"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "supersonicbranded",
+        "repo": "craftedjewelz-omega"
+      }
+    ]
+  }
+}

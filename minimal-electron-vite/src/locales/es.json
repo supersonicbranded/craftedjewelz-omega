@@ -1,0 +1,14 @@
+{
+  "welcome": "¡Bienvenido a CraftedJewelz!",
+  "performance": "Optimización de rendimiento",
+  "run_optimization": "Ejecutar optimización",
+  "optimizations_applied": "¡Optimizaciones aplicadas! (Simulado)",
+  "profiling_coming_soon": "Próximamente: perfilado y optimización para frontend/backend.",
+  "menu_file": "Archivo",
+  "menu_edit": "Editar",
+  "menu_view": "Vista",
+  "menu_plugins": "Plugins",
+  "menu_tools": "Herramientas",
+  "menu_help": "Ayuda",
+  "menu_account": "Cuenta"
+}
