@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 export type Screen = 'welcome' | 'design' | 'templates' | 'marketplace' | 'settings';
@@ -7,7 +7,41 @@ interface WelcomeScreenProps {
   onNavigate: (screen: Screen) => void;
 }
 
+interface Project {
+  id: string;
+  name: string;
+  thumbnail: string;
+  shapes: any[];
+  createdAt: Date;
+  modifiedAt: Date;
+  type: string;
+}
+
 export default function WelcomeScreen({ onNavigate }: WelcomeScreenProps) {
+  const [recentProjects, setRecentProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    // Load recent projects from localStorage
+    const savedProjects = JSON.parse(localStorage.getItem('craftedJewelz_projects') || '[]');
+    setRecentProjects(savedProjects.slice(0, 5)); // Show only 5 most recent
+  }, []);
+
+  const formatDate = (date: Date) => {
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - new Date(date).getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) return 'Today';
+    if (diffDays === 2) return 'Yesterday';
+    if (diffDays <= 7) return `${diffDays - 1} days ago`;
+    return new Date(date).toLocaleDateString();
+  };
+
+  const loadProject = (projectId: string) => {
+    // In a real implementation, this would load the project data
+    // For now, navigate to design canvas
+    onNavigate('design');
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-yellow-900 text-gray-100">
       {/* Header with Logo */}
@@ -159,30 +193,56 @@ export default function WelcomeScreen({ onNavigate }: WelcomeScreenProps) {
             >
               <h3 className="text-xl font-semibold text-white mb-6">Recent Projects</h3>
               <div className="space-y-3">
-                {[
-                  { name: "DiamondRingDesign.cjz", date: "Today", type: "Ring" },
-                  { name: "GoldPendantDraft.cjz", date: "Yesterday", type: "Pendant" },
-                  { name: "3DKeychainModel.cjz", date: "2 days ago", type: "Keychain" },
-                ].map((file, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 + idx * 0.1, duration: 0.4 }}
-                    className="flex justify-between items-center bg-gradient-to-r from-gray-800/40 to-gray-900/40 backdrop-blur-sm border border-yellow-700/20 p-4 rounded-lg hover:border-yellow-500/30 hover:bg-gradient-to-r hover:from-gray-800/60 hover:to-gray-900/60 cursor-pointer transition-all duration-200"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border border-yellow-500/30 rounded-lg flex items-center justify-center">
-                        <span className="text-yellow-400 font-semibold text-sm">{file.type[0]}</span>
+                {recentProjects.length > 0 ? (
+                  recentProjects.map((project, idx) => (
+                    <motion.div
+                      key={project.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + idx * 0.1, duration: 0.4 }}
+                      onClick={() => loadProject(project.id)}
+                      className="flex justify-between items-center bg-gradient-to-r from-gray-800/40 to-gray-900/40 backdrop-blur-sm border border-yellow-700/20 p-4 rounded-lg hover:border-yellow-500/30 hover:bg-gradient-to-r hover:from-gray-800/60 hover:to-gray-900/60 cursor-pointer transition-all duration-200"
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border border-yellow-500/30 rounded-lg flex items-center justify-center">
+                          <span className="text-yellow-400 font-semibold text-sm">{project.name[0]}</span>
+                        </div>
+                        <div>
+                          <span className="text-white font-medium">{project.name}</span>
+                          <p className="text-gray-400 text-sm">{project.shapes.length} shapes</p>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-white font-medium">{file.name}</span>
-                        <p className="text-gray-400 text-sm">{file.type}</p>
+                      <span className="text-sm text-yellow-300">{formatDate(project.modifiedAt)}</span>
+                    </motion.div>
+                  ))
+                ) : (
+                  // Show example projects when no saved projects exist
+                  [
+                    { name: "DiamondRingDesign.cjz", date: "Example", type: "Ring" },
+                    { name: "GoldPendantDraft.cjz", date: "Example", type: "Pendant" },
+                    { name: "3DKeychainModel.cjz", date: "Example", type: "Keychain" },
+                  ].map((file, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + idx * 0.1, duration: 0.4 }}
+                      onClick={() => onNavigate('design')}
+                      className="flex justify-between items-center bg-gradient-to-r from-gray-800/40 to-gray-900/40 backdrop-blur-sm border border-yellow-700/20 p-4 rounded-lg hover:border-yellow-500/30 hover:bg-gradient-to-r hover:from-gray-800/60 hover:to-gray-900/60 cursor-pointer transition-all duration-200"
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border border-yellow-500/30 rounded-lg flex items-center justify-center">
+                          <span className="text-yellow-400 font-semibold text-sm">{file.type[0]}</span>
+                        </div>
+                        <div>
+                          <span className="text-white font-medium">{file.name}</span>
+                          <p className="text-gray-400 text-sm">{file.type}</p>
+                        </div>
                       </div>
-                    </div>
-                    <span className="text-sm text-yellow-300">{file.date}</span>
-                  </motion.div>
-                ))}
+                      <span className="text-sm text-yellow-300">{file.date}</span>
+                    </motion.div>
+                  ))
+                )}
               </div>
             </motion.div>
 
@@ -193,10 +253,16 @@ export default function WelcomeScreen({ onNavigate }: WelcomeScreenProps) {
               transition={{ delay: 0.8, duration: 0.6 }}
               className="flex gap-4 mt-12"
             >
-              <button className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-gray-900 font-semibold px-8 py-4 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl">
+              <button
+                onClick={() => onNavigate('design')}
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-gray-900 font-semibold px-8 py-4 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl"
+              >
                 Start New Project
               </button>
-              <button className="border border-yellow-500/30 hover:border-yellow-500/50 text-yellow-300 hover:text-yellow-200 font-semibold px-8 py-4 rounded-lg backdrop-blur-sm hover:bg-yellow-500/10 transition-all duration-200">
+              <button
+                onClick={() => onNavigate('design')}
+                className="border border-yellow-500/30 hover:border-yellow-500/50 text-yellow-300 hover:text-yellow-200 font-semibold px-8 py-4 rounded-lg backdrop-blur-sm hover:bg-yellow-500/10 transition-all duration-200"
+              >
                 Open Workspace
               </button>
             </motion.div>

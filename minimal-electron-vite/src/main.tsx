@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import WelcomeScreen from "./components/WelcomeScreen";
+import DesignCanvas from "./components/DesignCanvas";
+import TemplatesScreen from "./components/TemplatesScreen";
+import MarketplaceScreen from "./components/MarketplaceScreen";
+import SettingsScreen from "./components/SettingsScreen";
 import "./index.css";
 
 type Screen = 'welcome' | 'design' | 'templates' | 'marketplace' | 'settings';
@@ -15,13 +19,13 @@ function App() {
   const renderScreen = () => {
     switch (currentScreen) {
       case 'design':
-        return <div className="p-8 text-center"><h2 className="text-2xl text-white">Design Canvas Coming Soon</h2><button onClick={() => navigateToScreen('welcome')} className="mt-4 px-4 py-2 bg-yellow-500 text-black rounded">Back to Welcome</button></div>;
+        return <DesignCanvas onNavigate={navigateToScreen} />;
       case 'settings':
-        return <div className="p-8 text-center"><h2 className="text-2xl text-white">Settings Coming Soon</h2><button onClick={() => navigateToScreen('welcome')} className="mt-4 px-4 py-2 bg-yellow-500 text-black rounded">Back to Welcome</button></div>;
+        return <SettingsScreen onNavigate={navigateToScreen} />;
       case 'templates':
-        return <div className="p-8 text-center"><h2 className="text-2xl text-white">Templates Coming Soon</h2><button onClick={() => navigateToScreen('welcome')} className="mt-4 px-4 py-2 bg-yellow-500 text-black rounded">Back to Welcome</button></div>;
+        return <TemplatesScreen onNavigate={navigateToScreen} />;
       case 'marketplace':
-        return <div className="p-8 text-center"><h2 className="text-2xl text-white">Marketplace Coming Soon</h2><button onClick={() => navigateToScreen('welcome')} className="mt-4 px-4 py-2 bg-yellow-500 text-black rounded">Back to Welcome</button></div>;
+        return <MarketplaceScreen onNavigate={navigateToScreen} />;
       default:
         return <WelcomeScreen onNavigate={navigateToScreen} />;
     }
