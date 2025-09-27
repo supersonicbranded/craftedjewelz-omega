@@ -11,7 +11,8 @@ import MenuBar from "./components/MenuBar";
 export type Screen = 'welcome' | 'design' | 'templates' | 'marketplace' | 'settings';
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
+  // Skip splash and onboarding for development - go directly to welcome screen
+  const [showSplash, setShowSplash] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
 
