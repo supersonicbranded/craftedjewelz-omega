@@ -1,7 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export default function WelcomeScreen() {
+export type Screen = 'welcome' | 'design' | 'templates' | 'marketplace' | 'settings';
+
+interface WelcomeScreenProps {
+  onNavigate: (screen: Screen) => void;
+}
+
+export default function WelcomeScreen({ onNavigate }: WelcomeScreenProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-yellow-900 text-gray-100">
       {/* Header with Logo */}
@@ -33,7 +39,10 @@ export default function WelcomeScreen() {
               </div>
             </div>
           </div>
-          <button className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-gray-900 font-semibold px-6 py-3 rounded-lg shadow-lg transition-all duration-200">
+          <button
+            onClick={() => onNavigate('design')}
+            className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-gray-900 font-semibold px-6 py-3 rounded-lg shadow-lg transition-all duration-200"
+          >
             New Design
           </button>
         </div>
@@ -43,25 +52,37 @@ export default function WelcomeScreen() {
         {/* Sidebar Navigation */}
         <aside className="w-64 border-r border-yellow-700/20 backdrop-blur-sm bg-gray-900/50">
           <nav className="p-6 space-y-2">
-            <button className="w-full text-left hover:bg-yellow-600/10 hover:border-yellow-500/30 border border-transparent px-4 py-3 rounded-lg transition-all duration-200 group">
+            <button
+              onClick={() => onNavigate('welcome')}
+              className="w-full text-left hover:bg-yellow-600/10 hover:border-yellow-500/30 border border-transparent px-4 py-3 rounded-lg transition-all duration-200 group"
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-5 h-5 bg-yellow-500/20 rounded group-hover:bg-yellow-500/30 transition-colors"></div>
                 <span className="text-gray-200 group-hover:text-yellow-300">Home</span>
               </div>
             </button>
-            <button className="w-full text-left hover:bg-yellow-600/10 hover:border-yellow-500/30 border border-transparent px-4 py-3 rounded-lg transition-all duration-200 group">
+            <button
+              onClick={() => onNavigate('templates')}
+              className="w-full text-left hover:bg-yellow-600/10 hover:border-yellow-500/30 border border-transparent px-4 py-3 rounded-lg transition-all duration-200 group"
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-5 h-5 bg-yellow-500/20 rounded group-hover:bg-yellow-500/30 transition-colors"></div>
                 <span className="text-gray-200 group-hover:text-yellow-300">Templates</span>
               </div>
             </button>
-            <button className="w-full text-left hover:bg-yellow-600/10 hover:border-yellow-500/30 border border-transparent px-4 py-3 rounded-lg transition-all duration-200 group">
+            <button
+              onClick={() => onNavigate('marketplace')}
+              className="w-full text-left hover:bg-yellow-600/10 hover:border-yellow-500/30 border border-transparent px-4 py-3 rounded-lg transition-all duration-200 group"
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-5 h-5 bg-yellow-500/20 rounded group-hover:bg-yellow-500/30 transition-colors"></div>
                 <span className="text-gray-200 group-hover:text-yellow-300">Marketplace</span>
               </div>
             </button>
-            <button className="w-full text-left hover:bg-yellow-600/10 hover:border-yellow-500/30 border border-transparent px-4 py-3 rounded-lg transition-all duration-200 group">
+            <button
+              onClick={() => onNavigate('settings')}
+              className="w-full text-left hover:bg-yellow-600/10 hover:border-yellow-500/30 border border-transparent px-4 py-3 rounded-lg transition-all duration-200 group"
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-5 h-5 bg-yellow-500/20 rounded group-hover:bg-yellow-500/30 transition-colors"></div>
                 <span className="text-gray-200 group-hover:text-yellow-300">Settings</span>
@@ -91,7 +112,8 @@ export default function WelcomeScreen() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1, duration: 0.4 }}
-                className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-yellow-700/20 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-yellow-500/30"
+                onClick={() => onNavigate('design')}
+                className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-yellow-700/20 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-yellow-500/30 cursor-pointer"
               >
                 <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg mb-4 flex items-center justify-center">
                   <span className="text-gray-900 font-bold">3D</span>
@@ -104,7 +126,8 @@ export default function WelcomeScreen() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.4 }}
-                className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-yellow-700/20 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-yellow-500/30"
+                onClick={() => onNavigate('design')}
+                className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-yellow-700/20 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-yellow-500/30 cursor-pointer"
               >
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg mb-4 flex items-center justify-center">
                   <span className="text-white font-bold">AI</span>
@@ -117,7 +140,8 @@ export default function WelcomeScreen() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.4 }}
-                className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-yellow-700/20 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-yellow-500/30"
+                onClick={() => onNavigate('design')}
+                className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-yellow-700/20 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-yellow-500/30 cursor-pointer"
               >
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg mb-4 flex items-center justify-center">
                   <span className="text-white font-bold">⚡</span>
