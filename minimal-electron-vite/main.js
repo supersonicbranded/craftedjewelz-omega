@@ -17,7 +17,27 @@ function createWindow() {
   });
 
   // In development, load from Vite dev server
-  if (process.env.NODE_ENV === 'development') {
+  // Multiple ways to detect development mode
+  const isDev = !app.isPackaged || process.env.NODE_ENV === 'development' || process.defaultApp;
+
+  console.log('Development mode detection:', {
+    isPackaged: app.isPackaged,
+    nodeEnv: process.env.NODE_ENV,
+    defaultApp: process.defaultApp,
+    isDev: isDev
+  });
+
+  if (isDev) {
+    // Add error handling for development mode
+    mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+      if (validatedURL.includes('localhost:5173')) {
+        console.log('Waiting for Vite dev server to start...');
+        setTimeout(() => {
+          mainWindow.loadURL('http://localhost:5173');
+        }, 1000);
+      }
+    });
+
     mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools();
   } else {
