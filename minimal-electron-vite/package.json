@@ -60,12 +60,12 @@
     ],
     "mac": {
       "target": "dmg",
-      "icon": "build/appicon2.icns",
+      "icon": "build/icons/appicon.icns",
       "artifactName": "CraftedJewelz-${version}.dmg"
     },
     "win": {
       "target": "nsis",
-      "icon": "build/appicon2.ico",
+      "icon": "build/icons/appicon.ico",
       "artifactName": "CraftedJewelz-${version}-setup.exe"
     },
     "linux": {

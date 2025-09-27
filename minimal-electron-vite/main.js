@@ -1,9 +1,18 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 let mainWindow;
 
 function createWindow() {
+  // Try to find the best icon file available
+  let iconPath = path.join(__dirname, "build/icons/appicon.png");
+  if (!fs.existsSync(iconPath)) {
+    iconPath = path.join(__dirname, "public/logo.png");
+  }
+  if (!fs.existsSync(iconPath)) {
+    iconPath = path.join(__dirname, "build/appicon2.png");
+  }
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -13,7 +22,7 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true
     },
-    icon: path.join(__dirname, "build/icons/appicon2.png")
+    icon: iconPath // Use the best available icon
   });
 
   // In development, load from Vite dev server
