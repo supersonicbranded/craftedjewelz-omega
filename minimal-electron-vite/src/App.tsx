@@ -48,6 +48,9 @@ function App() {
     }
   };
 
+  // Debug: Log to make sure we're passing the function
+  console.log('navigateToScreen function:', typeof navigateToScreen);
+
   return (
     <I18nextProvider i18n={i18n}>
       <div className="matrixgold-theme min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950 text-gray-100">
