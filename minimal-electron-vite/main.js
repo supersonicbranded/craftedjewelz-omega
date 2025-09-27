@@ -13,6 +13,9 @@ function createWindow() {
   if (!fs.existsSync(iconPath)) {
     iconPath = path.join(__dirname, "build/appicon2.png");
   }
+
+  console.log('Using icon path:', iconPath);
+  console.log('Icon exists:', fs.existsSync(iconPath));
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -57,6 +60,11 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  // Set dock icon explicitly on macOS
+  if (process.platform === 'darwin' && fs.existsSync(iconPath)) {
+    app.dock.setIcon(iconPath);
+  }
 }
 
 app.whenReady().then(createWindow);
