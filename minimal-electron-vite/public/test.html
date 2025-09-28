@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional CAD Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1f1f1f;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .professional-interface {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+        .menu-bar {
+            background: #333;
+            padding: 8px 16px;
+            display: flex;
+            gap: 20px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .menu-item {
+            color: #d4af37;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .toolbar {
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .status {
+            background: #1a1a1a;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏆 Professional CAD Interface Test</h1>
+
+    <div class="professional-interface">
+        <div class="menu-bar">
+            <span class="menu-item">File</span>
+            <span class="menu-item">Edit</span>
+            <span class="menu-item">View</span>
+            <span class="menu-item">Create</span>
+            <span class="menu-item">Modify</span>
+            <span class="menu-item">Tools</span>
+            <span class="menu-item">Help</span>
+        </div>
+
+        <div class="toolbar">
+            🔧 Professional Toolbar - Selection | Transform | Curves | Surfaces | Jewelry Tools
+        </div>
+
+        <div style="background: #0f0f0f; height: 400px; border-radius: 4px; margin: 10px 0; display: flex; align-items: center; justify-content: center; border: 1px dashed #d4af37;">
+            <div style="text-align: center;">
+                <h2 style="color: #d4af37;">💎 Professional CAD Viewport</h2>
+                <p>Grid-based design canvas with professional tools</p>
+                <p>🎯 Industry-standard interface matching Rhino3D/MatrixGold</p>
+            </div>
+        </div>
+
+        <div class="status">
+            Status: Ready | Mouse: (0, 0) | Selection: 0 objects | Zoom: 100% | Snap: Grid | Units: mm
+        </div>
+    </div>
+
+    <div style="margin: 20px; padding: 20px; background: #2a2a2a; border-radius: 8px;">
+        <h3 style="color: #d4af37;">✨ Professional Features Implemented:</h3>
+        <ul style="color: #ccc; line-height: 1.6;">
+            <li>🎯 Professional Menu Bar (File, Edit, View, Create, Modify, Tools, Help)</li>
+            <li>🛠️ Expandable Toolbar with 9 tool groups</li>
+            <li>📋 Properties Panel with 4 tabs (Object, Material, Layers, Display)</li>
+            <li>📊 Professional Status Bar with coordinates and snap modes</li>
+            <li>⌨️ Command Line Interface with CAD commands</li>
+            <li>🔍 3D Preview Panel (resizable)</li>
+            <li>💎 Industry-standard workflow and shortcuts</li>
+            <li>🎨 Professional MatrixGold color scheme</li>
+        </ul>
+    </div>
+
+    <script>
+        console.log('Professional CAD Interface Test Page Loaded');
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                console.log('Menu clicked:', item.textContent);
+                alert(`Professional ${item.textContent} menu activated!`);
+            });
+        });
+    </script>
+</body>
+</html>
